@@ -1,1 +1,276 @@
 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cek Rekening</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .box {
+      width: 380px;
+      background: #1c1c1c;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 0 30px rgba(255, 193, 7, .15);
+    }
+
+    h2 {
+      text-align: center;
+      color: #ffc107;
+    }
+
+    label {
+      display: block;
+      margin-top: 18px;
+      margin-bottom: 7px;
+    }
+
+    select,
+    input,
+    button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 13px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #292929;
+      color: white;
+      font-size: 15px;
+    }
+
+    button {
+      margin-top: 20px;
+      background: #ffc107;
+      color: #111;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #ffca28;
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .valid {
+      background: #123d24;
+      color: #5cff9d;
+    }
+
+    .invalid {
+      background: #451818;
+      color: #ff7777;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+
+  <h2>CEK REKENING</h2>
+
+  <label>Pilih Bank / E-Wallet</label>
+
+  <select id="provider">
+    <option value="">-- Pilih --</option>
+    <option value="bca">BCA</option>
+    <option value="bri">BRI</option>
+    <option value="bni">BNI</option>
+    <option value="mandiri">Mandiri</option>
+    <option value="btn">BTN</option>
+    <option value="dana">DANA</option>
+    <option value="ovo">OVO</option>
+    <option value="gopay">GoPay</option>
+    <option value="shopeepay">ShopeePay</option>
+    <option value="shopeepay">SeaBank</option>
+  </select>
+
+  <label>Nomor Rekening / Nomor E-Wallet</label>
+
+  <input
+    type="text"
+    id="account"
+    placeholder="Masukkan nomor"
+    inputmode="numeric"
+  >
+
+  <button onclick="checkAccount()">
+    CEK REKENING
+  </button>
+
+  <div id="result"></div>
+
+</div>
+
+<script>
+
+const rules = {
+
+  bca: {
+    name: "BCA",
+    min: 10,
+    max: 10
+  },
+
+  bri: {
+    name: "BRI",
+    min: 10,
+    max: 16
+  },
+
+  bni: {
+    name: "BNI",
+    min: 10,
+    max: 10
+  },
+
+  mandiri: {
+    name: "Mandiri",
+    min: 10,
+    max: 13
+  },
+
+  btn: {
+    name: "BTN",
+    min: 10,
+    max: 16
+  },
+
+  dana: {
+    name: "DANA",
+    min: 10,
+    max: 13
+  },
+
+  ovo: {
+    name: "OVO",
+    min: 10,
+    max: 13
+  },
+
+  gopay: {
+    name: "GoPay",
+    min: 10,
+    max: 13
+  },
+
+  shopeepay: {
+    name: "ShopeePay",
+    min: 10,
+    max: 13
+  }
+
+};
+
+
+function checkAccount() {
+
+  const provider =
+    document.getElementById("provider").value;
+
+  const account =
+    document.getElementById("account").value.trim();
+
+  const result =
+    document.getElementById("result");
+
+
+  result.style.display = "block";
+
+
+  if (!provider) {
+
+    result.className = "invalid";
+
+    result.innerHTML =
+      "❌ Silakan pilih bank atau e-wallet.";
+
+    return;
+  }
+
+
+  if (!account) {
+
+    result.className = "invalid";
+
+    result.innerHTML =
+      "❌ Nomor rekening wajib diisi.";
+
+    return;
+  }
+
+
+  if (!/^[0-9]+$/.test(account)) {
+
+    result.className = "invalid";
+
+    result.innerHTML =
+      "❌ Nomor hanya boleh berisi angka.";
+
+    return;
+  }
+
+
+  const rule = rules[provider];
+
+
+  if (
+    account.length < rule.min ||
+    account.length > rule.max
+  ) {
+
+    result.className = "invalid";
+
+    result.innerHTML = `
+      ❌ Nomor tidak sesuai format ${rule.name}.<br>
+      Panjang yang diperbolehkan:
+      ${rule.min}-${rule.max} digit.
+    `;
+
+    return;
+  }
+
+
+  result.className = "valid";
+
+  result.innerHTML = `
+    ✅ Format nomor valid.<br><br>
+
+    <strong>Provider:</strong> ${rule.name}<br>
+    <strong>Nomor:</strong> ${account}<br>
+    <strong>Status:</strong> Format valid
+    <br><br>
+
+    <small>
+      Pemeriksaan ini hanya memvalidasi format.
+      Kepemilikan/nama rekening dan status rekening
+      aktif tidak dapat diverifikasi tanpa sumber data
+      resmi.
+    </small>
+  `;
+
+}
+
+</script>
+
+</body>
+</html>
