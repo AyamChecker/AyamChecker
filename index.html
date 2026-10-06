@@ -7,6 +7,11 @@
 <title>Ayam Checker</title>
 
 <style>
+
+/* =====================================================
+   RESET
+===================================================== */
+
 * {
     margin: 0;
     padding: 0;
@@ -14,214 +19,280 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
+
+/* =====================================================
+   BODY
+===================================================== */
+
 body {
     background:
-        radial-gradient(circle at top, rgba(255,193,7,.15), transparent 35%),
+        radial-gradient(
+            circle at top,
+            rgba(255,193,7,.15),
+            transparent 35%
+        ),
         #080808;
+
     color: #fff;
     min-height: 100vh;
 }
 
-/* =========================
+
+/* =====================================================
    HEADER
-========================= */
+===================================================== */
 
 header {
     height: 70px;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     background: rgba(0,0,0,.9);
-    border-bottom: 1px solid rgba(255,193,7,.3);
+
+    border-bottom:
+        1px solid rgba(255,193,7,.3);
+
     position: sticky;
     top: 0;
+
     z-index: 100;
+
     backdrop-filter: blur(10px);
 }
 
 .logo {
     font-size: 25px;
     font-weight: 900;
+
     letter-spacing: 2px;
+
     color: #ffd54a;
+
     text-shadow:
         0 0 8px rgba(255,193,7,.8),
         0 0 20px rgba(255,193,7,.35);
 }
 
-/* =========================
+
+/* =====================================================
    BANNER
-========================= */
+   SAMA LEBARNYA DENGAN CEK REKENING
+===================================================== */
 
 .banner-container {
     width: 100%;
-    max-width: 1100px;
-    margin: 25px auto 0;
-    padding: 0 15px;
+
+    max-width: 700px;
+
+    margin:
+        25px auto 0;
+
+    padding:
+        0 15px;
 }
+
+
+/* KOTAK SLIDER */
 
 .slider {
     position: relative;
+
     width: 100%;
-    height: 260px;
+
+    /*
+       Rasio banner dibuat horizontal
+       supaya sesuai dengan card Cek Rekening
+    */
+    aspect-ratio: 16 / 5;
+
+    min-height: 150px;
+    max-height: 220px;
+
     overflow: hidden;
-    border-radius: 22px;
-    border: 1px solid rgba(255,193,7,.35);
+
+    border-radius: 20px;
+
+    border:
+        1px solid rgba(255,193,7,.35);
+
     box-shadow:
         0 0 30px rgba(255,193,7,.12),
         inset 0 0 30px rgba(255,193,7,.03);
 }
 
+
+/* =====================================================
+   SLIDE
+===================================================== */
+
 .slide {
     position: absolute;
-    inset: 0;
-    opacity: 0;
-    transform: scale(1.04);
-    transition: opacity .7s ease, transform 1s ease;
 
-    display: flex;
-    align-items: center;
-    padding: 45px;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    opacity: 0;
+
+    transform: scale(1.04);
+
+    transition:
+        opacity .7s ease,
+        transform 1s ease;
+
+    overflow: hidden;
 }
 
 .slide.active {
     opacity: 1;
+
     transform: scale(1);
 }
 
-.slide:nth-child(1) {
-    background:
-        linear-gradient(
-            100deg,
-            rgba(0,0,0,.95),
-            rgba(70,45,0,.8),
-            rgba(255,193,7,.18)
-        );
+
+/* =====================================================
+   GAMBAR BANNER
+===================================================== */
+
+.slide img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    /*
+       Gambar memenuhi banner
+       tanpa menjadi gepeng
+    */
+    object-fit: cover;
+
+    object-position: center;
 }
 
-.slide:nth-child(2) {
-    background:
-        linear-gradient(
-            100deg,
-            rgba(0,0,0,.95),
-            rgba(80,50,0,.75),
-            rgba(255,215,64,.16)
-        );
-}
 
-.slide:nth-child(3) {
-    background:
-        linear-gradient(
-            100deg,
-            rgba(0,0,0,.95),
-            rgba(55,40,0,.8),
-            rgba(255,179,0,.16)
-        );
-}
-
-.slide-content {
-    max-width: 650px;
-}
-
-.tag {
-    display: inline-block;
-    padding: 7px 14px;
-    border-radius: 30px;
-    background: rgba(255,193,7,.15);
-    border: 1px solid rgba(255,193,7,.5);
-    color: #ffd54a;
-    font-size: 12px;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.slide h1 {
-    font-size: clamp(30px,5vw,52px);
-    line-height: 1;
-    margin-bottom: 15px;
-    color: #ffd54a;
-    text-shadow: 0 0 15px rgba(255,193,7,.35);
-}
-
-.slide p {
-    color: #ddd;
-    font-size: 15px;
-    line-height: 1.6;
-}
-
-/* DOTS */
+/* =====================================================
+   DOTS
+===================================================== */
 
 .dots {
     position: absolute;
-    bottom: 18px;
+
+    bottom: 12px;
+
     left: 50%;
-    transform: translateX(-50%);
+
+    transform:
+        translateX(-50%);
+
     display: flex;
-    gap: 8px;
-    z-index: 10;
+
+    align-items: center;
+
+    gap: 7px;
+
+    z-index: 20;
 }
 
 .dot {
-    width: 9px;
-    height: 9px;
+    width: 8px;
+    height: 8px;
+
     border-radius: 50%;
-    background: rgba(255,255,255,.3);
+
+    background:
+        rgba(255,255,255,.35);
+
     cursor: pointer;
+
     transition: .3s;
 }
 
 .dot.active {
-    width: 27px;
+    width: 23px;
+
     border-radius: 20px;
+
     background: #ffc107;
-    box-shadow: 0 0 10px rgba(255,193,7,.7);
+
+    box-shadow:
+        0 0 10px rgba(255,193,7,.7);
 }
 
-/* =========================
+
+/* =====================================================
    MAIN
-========================= */
+===================================================== */
 
 main {
     width: 100%;
+
     max-width: 700px;
-    margin: 35px auto;
-    padding: 0 15px;
+
+    margin:
+        30px auto;
+
+    padding:
+        0 15px;
 }
 
+
+/* =====================================================
+   CHECKER CARD
+===================================================== */
+
 .checker-card {
+
     background:
         linear-gradient(
             145deg,
             rgba(30,30,30,.98),
             rgba(12,12,12,.98)
         );
-    border: 1px solid rgba(255,193,7,.25);
+
+    border:
+        1px solid rgba(255,193,7,.25);
+
     border-radius: 22px;
+
     padding: 30px;
+
     box-shadow:
         0 20px 60px rgba(0,0,0,.5),
         0 0 30px rgba(255,193,7,.06);
 }
 
+
+/* =====================================================
+   CHECKER TITLE
+===================================================== */
+
 .checker-title {
     text-align: center;
+
     margin-bottom: 25px;
 }
 
 .checker-title h2 {
     font-size: 28px;
+
     color: #ffd54a;
+
     margin-bottom: 8px;
 }
 
 .checker-title p {
     color: #888;
+
     font-size: 14px;
 }
 
-/* =========================
+
+/* =====================================================
    FORM
-========================= */
+===================================================== */
 
 .form-group {
     margin-bottom: 18px;
@@ -229,45 +300,73 @@ main {
 
 .form-group label {
     display: block;
+
     margin-bottom: 8px;
+
     color: #ddd;
+
     font-size: 14px;
+
     font-weight: bold;
 }
+
+
+/* =====================================================
+   INPUT & SELECT
+===================================================== */
 
 select,
 input {
     width: 100%;
+
     height: 52px;
-    padding: 0 15px;
+
+    padding:
+        0 15px;
+
     background: #111;
-    border: 1px solid #333;
+
+    border:
+        1px solid #333;
+
     color: #fff;
+
     border-radius: 12px;
+
     outline: none;
+
     font-size: 15px;
+
     transition: .3s;
 }
 
 select:focus,
 input:focus {
     border-color: #ffc107;
-    box-shadow: 0 0 15px rgba(255,193,7,.12);
+
+    box-shadow:
+        0 0 15px rgba(255,193,7,.12);
 }
 
 option {
     background: #111;
+
     color: white;
 }
 
-/* =========================
+
+/* =====================================================
    BUTTON
-========================= */
+===================================================== */
 
 .check-btn {
+
     width: 100%;
+
     height: 54px;
+
     border: none;
+
     border-radius: 12px;
 
     background:
@@ -278,8 +377,11 @@ option {
         );
 
     color: #111;
+
     font-size: 16px;
+
     font-weight: 900;
+
     cursor: pointer;
 
     transition: .3s;
@@ -289,167 +391,315 @@ option {
 }
 
 .check-btn:hover {
-    transform: translateY(-2px);
+
+    transform:
+        translateY(-2px);
+
     box-shadow:
         0 12px 30px rgba(255,193,7,.35);
 }
 
 .check-btn:active {
-    transform: scale(.98);
+
+    transform:
+        scale(.98);
 }
 
-/* =========================
+
+/* =====================================================
    LOADING
-========================= */
+===================================================== */
 
 .loading {
+
     display: none;
+
     text-align: center;
+
     margin-top: 25px;
+
     color: #ffd54a;
 }
 
 .spinner {
+
     width: 35px;
     height: 35px;
-    border: 3px solid #333;
-    border-top-color: #ffc107;
+
+    border:
+        3px solid #333;
+
+    border-top-color:
+        #ffc107;
+
     border-radius: 50%;
-    margin: 0 auto 12px;
-    animation: spin .8s linear infinite;
+
+    margin:
+        0 auto 12px;
+
+    animation:
+        spin .8s linear infinite;
 }
 
 @keyframes spin {
+
     to {
-        transform: rotate(360deg);
+        transform:
+            rotate(360deg);
     }
+
 }
 
-/* =========================
+
+/* =====================================================
    RESULT
-========================= */
+===================================================== */
 
 .result {
+
     display: none;
+
     margin-top: 25px;
+
     padding: 20px;
+
     border-radius: 15px;
+
     background: #101010;
-    border: 1px solid rgba(255,193,7,.25);
+
+    border:
+        1px solid rgba(255,193,7,.25);
 }
 
 .result-title {
+
     color: #ffd54a;
+
     font-weight: bold;
+
     margin-bottom: 15px;
+
     font-size: 17px;
 }
 
 .result-row {
+
     display: flex;
+
     justify-content: space-between;
+
     gap: 15px;
+
     padding: 12px 0;
-    border-bottom: 1px solid #222;
+
+    border-bottom:
+        1px solid #222;
 }
 
 .result-row:last-child {
-    border-bottom: none;
+
+    border-bottom:
+        none;
 }
 
 .result-label {
+
     color: #777;
 }
 
 .result-value {
+
     color: #fff;
+
     font-weight: bold;
+
     text-align: right;
+
     word-break: break-word;
 }
 
 .status {
+
     color: #4caf50;
 }
 
-/* =========================
-   INFO
-========================= */
+
+/* =====================================================
+   INFO BOX
+===================================================== */
 
 .info-box {
+
     margin-top: 18px;
+
     padding: 14px;
+
     border-radius: 12px;
-    background: rgba(255,193,7,.05);
-    border: 1px solid rgba(255,193,7,.12);
+
+    background:
+        rgba(255,193,7,.05);
+
+    border:
+        1px solid rgba(255,193,7,.12);
+
     color: #999;
+
     font-size: 12px;
+
     line-height: 1.6;
+
     text-align: center;
 }
 
-/* =========================
+
+/* =====================================================
    FOOTER
-========================= */
+===================================================== */
 
 footer {
+
     text-align: center;
-    padding: 30px 15px;
+
+    padding:
+        30px 15px;
+
     color: #666;
+
     font-size: 12px;
 }
 
 footer strong {
+
     color: #ffc107;
 }
 
-/* =========================
-   MOBILE
-========================= */
 
-@media (max-width:600px) {
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
 
     header {
+
         height: 60px;
     }
 
     .logo {
+
         font-size: 20px;
     }
 
+
+    /* BANNER HP */
+
+    .banner-container {
+
+        max-width: 700px;
+
+        padding:
+            0 15px;
+
+        margin-top: 20px;
+    }
+
+
     .slider {
-        height: 300px;
+
+        /*
+           Banner HP sedikit lebih tinggi
+           agar gambar tetap nyaman dilihat
+        */
+        aspect-ratio: 16 / 7;
+
+        min-height: 130px;
+
+        max-height: 180px;
+
+        border-radius: 16px;
     }
 
-    .slide {
-        padding: 30px 25px;
+
+    .checker-card {
+
+        padding:
+            22px 18px;
     }
 
-    .slide h1 {
-        font-size: 36px;
+
+    .checker-title h2 {
+
+        font-size: 24px;
     }
 
-    .slide p {
+
+    .checker-title p {
+
+        font-size: 13px;
+    }
+
+
+    select,
+    input {
+
+        height: 50px;
+
         font-size: 14px;
     }
 
-    .checker-card {
-        padding: 22px 18px;
+
+    .check-btn {
+
+        height: 52px;
+
+        font-size: 15px;
     }
 
-    .checker-title h2 {
-        font-size: 24px;
-    }
 }
+
+
+/* =====================================================
+   VERY SMALL PHONE
+===================================================== */
+
+@media (max-width: 380px) {
+
+    .banner-container {
+
+        padding:
+            0 10px;
+    }
+
+    main {
+
+        padding:
+            0 10px;
+    }
+
+    .checker-card {
+
+        padding:
+            20px 15px;
+    }
+
+    .slider {
+
+        aspect-ratio:
+            16 / 8;
+    }
+
+}
+
 </style>
 </head>
 
 
 <body>
 
-<!-- =========================
+
+<!-- =====================================================
      HEADER
-========================= -->
+===================================================== -->
 
 <header>
 
@@ -459,60 +709,59 @@ footer strong {
 
 </header>
 
+
+
+<!-- =====================================================
+     BANNER
+===================================================== -->
+
 <section class="banner-container">
 
     <div class="slider">
 
+
         <!-- SLIDE 1 -->
+
         <div class="slide active">
+
             <img
-                src="https://i.postimg.cc/tg55ynk9/Ayam-Chceker1.png"
-                alt="Ayam Checker"
+                src="https://i.postimg.cc/pVKZC7bW/Ayam-Checker1.png"
+                alt="Ayam Checker Banner 1"
             >
+
         </div>
+
+
 
         <!-- SLIDE 2 -->
+
         <div class="slide">
+
             <img
-                src="https://i.postimg.cc/G3sXTthv/Ayam-Chceker2.png"
-                alt="Ayam Checker"
+                src="URL_GAMBAR_BANNER_2"
+                alt="Ayam Checker Banner 2"
             >
+
         </div>
+
+
 
         <!-- SLIDE 3 -->
+
         <div class="slide">
+
             <img
-                src="https://i.postimg.cc/Mpz5LY0h/Ayam-Chceker3.png"
-                alt="Ayam Checker"
+                src="URL_GAMBAR_BANNER_3"
+                alt="Ayam Checker Banner 3"
             >
-        </div>
-
-        <!-- DOTS -->
-        <div class="dots">
-
-            <div
-                class="dot active"
-                onclick="showSlide(0)">
-            </div>
-
-            <div
-                class="dot"
-                onclick="showSlide(1)">
-            </div>
-
-            <div
-                class="dot"
-                onclick="showSlide(2)">
-            </div>
 
         </div>
 
-    </div>
-
-</section>
 
 
-        <!-- DOTS -->
+        <!-- =================================================
+             DOTS
+        ================================================== -->
 
         <div class="dots">
 
@@ -533,250 +782,279 @@ footer strong {
 
         </div>
 
+
     </div>
 
 </section>
 
 
-<!-- =========================
+
+<!-- =====================================================
      CHECKER
-========================= -->
+===================================================== -->
 
 <main>
 
-<div class="checker-card">
-
-    <div class="checker-title">
-
-        <h2>
-            🔎 Cek Rekening
-        </h2>
-
-        <p>
-            Pilih jenis rekening dan masukkan nomornya
-        </p>
-
-    </div>
+    <div class="checker-card">
 
 
-    <form id="checkerForm">
+        <!-- TITLE -->
 
-        <!-- =========================
-             JENIS
-        ========================== -->
+        <div class="checker-title">
 
-        <div class="form-group">
+            <h2>
+                🔎 Cek Rekening
+            </h2>
 
-            <label>
-                Pilih Jenis
-            </label>
+            <p>
+                Pilih jenis rekening dan masukkan nomornya
+            </p>
 
-            <select
-                id="type"
-                onchange="updateProvider()"
+        </div>
+
+
+
+        <!-- FORM -->
+
+        <form id="checkerForm">
+
+
+            <!-- JENIS -->
+
+            <div class="form-group">
+
+                <label>
+                    Pilih Jenis
+                </label>
+
+                <select
+                    id="type"
+                    onchange="updateProvider()"
+                >
+
+                    <option value="bank">
+                        🏦 BANK
+                    </option>
+
+                    <option value="ewallet">
+                        💳 E-WALLET
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- PROVIDER -->
+
+            <div class="form-group">
+
+                <label id="providerLabel">
+                    Pilih Bank
+                </label>
+
+                <select id="provider">
+
+                </select>
+
+            </div>
+
+
+
+            <!-- NOMOR -->
+
+            <div class="form-group">
+
+                <label>
+                    Nomor Rekening / Nomor E-Wallet
+                </label>
+
+                <input
+                    type="text"
+                    id="accountNumber"
+                    placeholder="Masukkan nomor rekening"
+                    autocomplete="off"
+                    inputmode="numeric"
+                >
+
+            </div>
+
+
+
+            <!-- BUTTON -->
+
+            <button
+                type="submit"
+                class="check-btn"
             >
 
-                <option value="bank">
-                    🏦 BANK
-                </option>
+                🔍 CEK REKENING
 
-                <option value="ewallet">
-                    💳 E-WALLET
-                </option>
-
-            </select>
-
-        </div>
+            </button>
 
 
-        <!-- =========================
-             PROVIDER
-        ========================== -->
-
-        <div class="form-group">
-
-            <label id="providerLabel">
-                Pilih Bank
-            </label>
-
-            <select id="provider">
-
-            </select>
-
-        </div>
+        </form>
 
 
-        <!-- =========================
-             NOMOR
-        ========================== -->
 
-        <div class="form-group">
+        <!-- =================================================
+             LOADING
+        ================================================== -->
 
-            <label>
-                Nomor Rekening / Nomor E-Wallet
-            </label>
-
-            <input
-                type="text"
-                id="accountNumber"
-                placeholder="Masukkan nomor rekening"
-                autocomplete="off"
-            >
-
-        </div>
-
-
-        <!-- =========================
-             BUTTON
-        ========================== -->
-
-        <button
-            type="submit"
-            class="check-btn"
+        <div
+            class="loading"
+            id="loading"
         >
-            🔍 CEK REKENING
-        </button>
 
-    </form>
+            <div class="spinner"></div>
+
+            Sedang melakukan pengecekan...
+
+        </div>
 
 
-    <!-- =========================
-         LOADING
-    ========================== -->
 
-    <div
-        class="loading"
-        id="loading"
-    >
+        <!-- =================================================
+             RESULT
+        ================================================== -->
 
-        <div class="spinner"></div>
+        <div
+            class="result"
+            id="result"
+        >
 
-        Sedang melakukan pengecekan...
+            <div class="result-title">
+
+                Hasil Pengecekan
+
+            </div>
+
+
+
+            <div class="result-row">
+
+                <span class="result-label">
+                    Jenis
+                </span>
+
+                <span
+                    class="result-value"
+                    id="resultType"
+                >
+                    -
+                </span>
+
+            </div>
+
+
+
+            <div class="result-row">
+
+                <span class="result-label">
+                    Provider
+                </span>
+
+                <span
+                    class="result-value"
+                    id="resultProvider"
+                >
+                    -
+                </span>
+
+            </div>
+
+
+
+            <div class="result-row">
+
+                <span class="result-label">
+                    Nomor
+                </span>
+
+                <span
+                    class="result-value"
+                    id="resultNumber"
+                >
+                    -
+                </span>
+
+            </div>
+
+
+
+            <div class="result-row">
+
+                <span class="result-label">
+                    Nama
+                </span>
+
+                <span
+                    class="result-value"
+                    id="resultName"
+                >
+                    API BELUM TERHUBUNG
+                </span>
+
+            </div>
+
+
+
+            <div class="result-row">
+
+                <span class="result-label">
+                    Status
+                </span>
+
+                <span
+                    class="result-value status"
+                    id="resultStatus"
+                >
+                    Menunggu API
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             INFO
+        ================================================== -->
+
+        <div class="info-box">
+
+            ⚠️ Data nama pemilik rekening hanya dapat
+            ditampilkan apabila sistem telah terhubung
+            dengan API validasi rekening yang sah.
+
+        </div>
+
 
     </div>
-
-
-    <!-- =========================
-         RESULT
-    ========================== -->
-
-    <div
-        class="result"
-        id="result"
-    >
-
-        <div class="result-title">
-            Hasil Pengecekan
-        </div>
-
-        <div class="result-row">
-
-            <span class="result-label">
-                Jenis
-            </span>
-
-            <span
-                class="result-value"
-                id="resultType"
-            >
-                -
-            </span>
-
-        </div>
-
-
-        <div class="result-row">
-
-            <span class="result-label">
-                Provider
-            </span>
-
-            <span
-                class="result-value"
-                id="resultProvider"
-            >
-                -
-            </span>
-
-        </div>
-
-
-        <div class="result-row">
-
-            <span class="result-label">
-                Nomor
-            </span>
-
-            <span
-                class="result-value"
-                id="resultNumber"
-            >
-                -
-            </span>
-
-        </div>
-
-
-        <div class="result-row">
-
-            <span class="result-label">
-                Nama
-            </span>
-
-            <span
-                class="result-value"
-                id="resultName"
-            >
-                API BELUM TERHUBUNG
-            </span>
-
-        </div>
-
-
-        <div class="result-row">
-
-            <span class="result-label">
-                Status
-            </span>
-
-            <span
-                class="result-value status"
-                id="resultStatus"
-            >
-                Menunggu API
-            </span>
-
-        </div>
-
-    </div>
-
-
-    <!-- INFO -->
-
-    <div class="info-box">
-
-        ⚠️ Data nama pemilik rekening hanya dapat
-        ditampilkan apabila sistem telah terhubung
-        dengan API validasi rekening yang sah.
-
-    </div>
-
-</div>
 
 </main>
 
 
-<!-- =========================
+
+<!-- =====================================================
      FOOTER
-========================= -->
+===================================================== -->
 
 <footer>
 
     © 2026
-    <strong>AYAM CHECKER</strong>
-   | SEO GET
+
+    <strong>
+        AYAM CHECKER
+    </strong>
+
+    | SEO GET
 
 </footer>
+
 
 
 <script>
@@ -815,24 +1093,35 @@ function showSlide(index) {
     dots[index].classList.add("active");
 
     currentSlide = index;
+
 }
 
+
+/* =====================================================
+   SLIDER OTOMATIS
+===================================================== */
 
 function nextSlide() {
 
     currentSlide++;
 
-    if (currentSlide >= slides.length) {
+    if (
+        currentSlide >= slides.length
+    ) {
 
         currentSlide = 0;
 
     }
 
     showSlide(currentSlide);
+
 }
 
 
-setInterval(nextSlide, 5000);
+setInterval(
+    nextSlide,
+    5000
+);
 
 
 /* =====================================================
@@ -922,7 +1211,7 @@ const ewalletList = [
 
 
 /* =====================================================
-   UPDATE BANK / E-WALLET
+   UPDATE PROVIDER
 ===================================================== */
 
 function updateProvider() {
@@ -937,12 +1226,8 @@ function updateProvider() {
         document.getElementById("providerLabel");
 
 
-    /* HAPUS PILIHAN SEBELUMNYA */
-
     provider.innerHTML = "";
 
-
-    /* TENTUKAN LIST */
 
     let list;
 
@@ -966,7 +1251,7 @@ function updateProvider() {
     }
 
 
-    /* DEFAULT */
+    /* DEFAULT OPTION */
 
     const defaultOption =
         document.createElement("option");
@@ -978,21 +1263,27 @@ function updateProvider() {
             ? "— Pilih Bank —"
             : "— Pilih E-Wallet —";
 
-    provider.appendChild(defaultOption);
+    provider.appendChild(
+        defaultOption
+    );
 
 
-    /* MASUKKAN DATA */
+    /* PROVIDER */
 
     list.forEach(function(item) {
 
         const option =
             document.createElement("option");
 
-        option.value = item[0];
+        option.value =
+            item[0];
 
-        option.textContent = item[1];
+        option.textContent =
+            item[1];
 
-        provider.appendChild(option);
+        provider.appendChild(
+            option
+        );
 
     });
 
@@ -1011,13 +1302,19 @@ updateProvider();
 ===================================================== */
 
 const form =
-    document.getElementById("checkerForm");
+    document.getElementById(
+        "checkerForm"
+    );
 
 const loading =
-    document.getElementById("loading");
+    document.getElementById(
+        "loading"
+    );
 
 const result =
-    document.getElementById("result");
+    document.getElementById(
+        "result"
+    );
 
 
 form.addEventListener(
@@ -1027,33 +1324,53 @@ form.addEventListener(
         event.preventDefault();
 
 
+        /* DATA */
+
         const type =
-            document.getElementById("type").value;
+            document.getElementById(
+                "type"
+            ).value;
+
 
         const provider =
-            document.getElementById("provider").value;
+            document.getElementById(
+                "provider"
+            ).value;
+
 
         const accountNumber =
             document
-                .getElementById("accountNumber")
+                .getElementById(
+                    "accountNumber"
+                )
                 .value
                 .trim();
 
 
-        /* VALIDASI */
+        /* =================================================
+           VALIDASI PROVIDER
+        ================================================== */
 
         if (!provider) {
 
             alert(
+
                 type === "bank"
+
                     ? "Silakan pilih bank terlebih dahulu."
+
                     : "Silakan pilih e-wallet terlebih dahulu."
+
             );
 
             return;
 
         }
 
+
+        /* =================================================
+           VALIDASI NOMOR
+        ================================================== */
 
         if (!accountNumber) {
 
@@ -1066,25 +1383,33 @@ form.addEventListener(
         }
 
 
-        /* LOADING */
+        /* =================================================
+           LOADING
+        ================================================== */
 
-        result.style.display = "none";
+        result.style.display =
+            "none";
 
-        loading.style.display = "block";
+        loading.style.display =
+            "block";
 
 
         /*
-        ==================================================
+        ====================================================
         API BELUM DIPASANG
-        ==================================================
 
-        Nantinya bagian ini dapat diganti dengan:
+        Nantinya bagian ini dapat diganti dengan
+        backend API resmi.
+
+        Contoh:
 
         fetch("/api/check", {
             method: "POST",
+
             headers: {
                 "Content-Type": "application/json"
             },
+
             body: JSON.stringify({
                 type: type,
                 provider: provider,
@@ -1092,39 +1417,63 @@ form.addEventListener(
             })
         });
 
+        ====================================================
         */
 
 
-        await new Promise(function(resolve) {
+        await new Promise(
+            function(resolve) {
 
-            setTimeout(resolve, 1200);
+                setTimeout(
+                    resolve,
+                    1200
+                );
 
-        });
+            }
+        );
 
 
-        loading.style.display = "none";
+        /* =================================================
+           SELESAI LOADING
+        ================================================== */
 
-        result.style.display = "block";
+        loading.style.display =
+            "none";
+
+        result.style.display =
+            "block";
 
 
-        /* NAMA PROVIDER */
+        /* =================================================
+           NAMA PROVIDER
+        ================================================== */
+
+        const providerSelect =
+            document.getElementById(
+                "provider"
+            );
+
 
         const providerName =
-            document
-                .getElementById("provider")
+            providerSelect
                 .options[
-                    document
-                        .getElementById("provider")
-                        .selectedIndex
+                    providerSelect.selectedIndex
                 ]
                 .text;
 
 
+        /* =================================================
+           TAMPILKAN HASIL
+        ================================================== */
+
         document.getElementById(
             "resultType"
         ).textContent =
+
             type === "bank"
+
                 ? "BANK"
+
                 : "E-WALLET";
 
 
