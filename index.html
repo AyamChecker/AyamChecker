@@ -3,726 +3,395 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Typing Master Suite - Ultimate Typing Experience</title>
-  <!-- Tailwind CSS CDN -->
+  <title>Tribun Typing Test & Battle Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- PeerJS CDN untuk Multiplayer P2P -->
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-  
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;600;700;800&display=swap');
-
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #050505;
+      background-color: #0d0d0d;
       color: #f3f4f6;
     }
-
-    .font-mono-code {
-      font-family: 'Fira Code', monospace;
+    .dark-card {
+      background-color: #161618;
+      border: 1px solid #27272a;
+      transition: all 0.2s ease-in-out;
     }
-
-    /* Animated Neon Gradient Border */
-    @property --gradient-angle {
-      syntax: "<angle>";
-      initial-value: 0deg;
-      inherits: false;
+    .dark-card:hover {
+      border-color: #52525b;
+      transform: translateY(-2px);
     }
-
-    @keyframes spinGradient {
-      0% { --gradient-angle: 0deg; }
-      100% { --gradient-angle: 360deg; }
-    }
-
-    .neon-card {
-      position: relative;
-      background: #0d0d11;
-      border-radius: 1rem;
-      z-index: 1;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
-
-    .neon-card::before,
-    .neon-card::after {
-      content: '';
-      position: absolute;
-      inset: -2px;
-      border-radius: 1.1rem;
-      background: conic-gradient(
-        from var(--gradient-angle),
-        #ffffff 0deg,
-        #eab308 90deg,
-        #ffffff 180deg,
-        #ca8a04 270deg,
-        #ffffff 360deg
-      );
-      animation: spinGradient 4s linear infinite;
-      z-index: -1;
-      opacity: 0.35;
-      transition: opacity 0.3s ease;
-    }
-
-    .neon-card::after {
-      filter: blur(12px);
-      opacity: 0.2;
-    }
-
-    .neon-card:hover {
-      transform: translateY(-4px);
-    }
-
-    .neon-card:hover::before {
-      opacity: 0.9;
-    }
-
-    .neon-card:hover::after {
-      opacity: 0.6;
-    }
-
-    /* Text Glow & Gradients */
-    .gold-gradient-text {
-      background: linear-gradient(135deg, #ffffff 0%, #fef08a 35%, #eab308 70%, #ffffff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    /* Typing Test Elements */
-    .word-box {
-      display: inline-flex;
-      margin-right: 0.6em;
-      margin-bottom: 0.4em;
-    }
-
-    .char-default {
-      color: #4b5563;
-      transition: color 0.05s ease;
-    }
-
-    .char-correct {
-      color: #4ade80;
-      text-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
-    }
-
-    .char-incorrect {
-      color: #f87171;
-      background: rgba(248, 113, 113, 0.2);
-      border-radius: 2px;
-      text-decoration: underline;
-    }
-
-    .char-current {
-      position: relative;
-      color: #fef08a;
-      border-left: 2.5px solid #eab308;
-      animation: blink 0.9s infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { border-color: #eab308; }
-      50% { border-color: transparent; }
-    }
-
-    /* Custom Scrollbar */
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #0a0a0f;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #374151;
-      border-radius: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #ca8a04;
-    }
+    .char-default { color: #71717a; }
+    .char-correct { color: #f4f4f5; text-shadow: 0 0 5px rgba(255,255,255,0.3); }
+    .char-incorrect { color: #ef4444; background: rgba(239, 68, 68, 0.2); border-radius: 2px; }
+    .char-current { border-left: 2px solid #ffffff; animation: blink 1s infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #121214; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
+<body class="min-h-screen font-sans flex flex-col justify-between p-4 sm:p-8">
 
-  <!-- NAVBAR HEADER -->
-  <header class="border-b border-gray-800/80 bg-gray-950/80 backdrop-blur-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-      
-      <!-- Logo / Title -->
-      <div onclick="switchView('dashboard')" class="flex items-center gap-3 cursor-pointer group">
-        <div class="p-2.5 bg-amber-500/10 text-amber-400 rounded-xl border border-amber-500/30 group-hover:border-amber-400 transition">
-          <i class="fa-solid fa-keyboard text-2xl animate-pulse"></i>
-        </div>
-        <div>
-          <h1 class="text-xl font-black tracking-wider gold-gradient-text uppercase">Typing Master</h1>
-          <p class="text-[10px] text-gray-400 font-mono tracking-widest uppercase">Multi-Mode Speed Practice</p>
-        </div>
+  <!-- HEADER / NAVBAR -->
+  <header class="max-w-6xl w-full mx-auto flex items-center justify-between pb-6 border-b border-zinc-800">
+    <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('dashboard')">
+      <div class="p-2 bg-zinc-800 text-white rounded-xl">
+        <i class="fa-solid fa-keyboard text-xl"></i>
       </div>
-
-      <!-- Quick Nav Status & Global Action -->
-      <div class="flex items-center gap-4">
-        <button id="nav-mode-badge" onclick="switchView('dashboard')" class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gray-900 border border-amber-500/30 text-amber-300 text-xs font-semibold hover:border-amber-400 transition">
-          <i class="fa-solid fa-grid-2 mr-1"></i> <span id="current-mode-title">Dashboard</span>
-        </button>
-        <button onclick="resetCurrentGame()" title="Ulangi / Refresh Test" class="p-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-800 text-amber-400 transition">
-          <i class="fa-solid fa-rotate-right"></i>
-        </button>
+      <div>
+        <h1 class="text-base font-bold tracking-wider text-white">TRIBUN TYPING</h1>
+        <p class="text-xs text-zinc-500">Indonesia Edition</p>
       </div>
-
     </div>
+    <button onclick="switchView('dashboard')" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-semibold rounded-xl text-xs transition">
+      <i class="fa-solid fa-house mr-1"></i> Menu Utama
+    </button>
   </header>
 
   <!-- MAIN CONTAINER -->
-  <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 flex flex-col justify-center">
+  <main class="max-w-6xl w-full mx-auto my-6 flex-1 flex flex-col justify-center">
 
-    <!-- ==================== VIEW 1: DASHBOARD / MODE SELECTION ==================== -->
-    <section id="view-dashboard" class="space-y-8 animate-fadeIn">
+    <!-- 1. VIEW: DASHBOARD MENU UTAMA (GRID KARTU PILIHAN) -->
+    <div id="view-dashboard" class="space-y-6">
+      <div class="text-center md:text-left">
+        <h2 class="text-2xl font-extrabold text-white tracking-wide">Pilih Mode Permainan</h2>
+        <p class="text-xs text-zinc-400 mt-1">Uji kemampuan mengetik Anda sendiri atau bertanding bersama teman secara real-time.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        
+        <!-- Kartu 1: Typing Test -->
+        <div onclick="startTypingTestMode(60)" class="dark-card p-6 rounded-2xl cursor-pointer flex flex-col justify-between space-y-4">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-4">
+              <i class="fa-solid fa-stopwatch text-lg"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">Typing Test</h3>
+            <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Uji kecepatan mengetik 60 detik menggunakan kosakata bahasa Indonesia sehari-hari.</p>
+          </div>
+          <span class="text-xs font-bold text-zinc-300 flex items-center gap-1">Mulai Tes <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+        </div>
+
+        <!-- Kartu 2: Competition -->
+        <div onclick="startTypingTestMode(30)" class="dark-card p-6 rounded-2xl cursor-pointer flex flex-col justify-between space-y-4">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-amber-400 mb-4">
+              <i class="fa-solid fa-trophy text-lg"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">Competition (30s)</h3>
+            <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Mode tantangan cepat 30 detik untuk melatih refleks dan akurasi jari.</p>
+          </div>
+          <span class="text-xs font-bold text-zinc-300 flex items-center gap-1">Mulai Kompetisi <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+        </div>
+
+        <!-- Kartu 3: Multiplayer -->
+        <div onclick="switchView('multiplayer')" class="dark-card p-6 rounded-2xl cursor-pointer flex flex-col justify-between space-y-4">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-blue-400 mb-4">
+              <i class="fa-solid fa-users text-lg"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">Multiplayer</h3>
+            <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Buat room khusus, bagikan link undangan, dan berlomba mengetik secara langsung.</p>
+          </div>
+          <span class="text-xs font-bold text-zinc-300 flex items-center gap-1">Masuk Room <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+        </div>
+
+        <!-- Kartu 4: Text Practice -->
+        <div onclick="openCustomTextModal()" class="dark-card p-6 rounded-2xl cursor-pointer flex flex-col justify-between space-y-4">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-emerald-400 mb-4">
+              <i class="fa-solid fa-file-lines text-lg"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">Text Practice</h3>
+            <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Latihan menggunakan teks atau paragraf buatan Anda sendiri dengan bebas.</p>
+          </div>
+          <span class="text-xs font-bold text-zinc-300 flex items-center gap-1">Gunakan Teks Sendiri <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+        </div>
+
+        <!-- Kartu 5: Custom Mode -->
+        <div onclick="switchView('custom-settings')" class="dark-card p-6 rounded-2xl cursor-pointer flex flex-col justify-between space-y-4">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-purple-400 mb-4">
+              <i class="fa-solid fa-sliders text-lg"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">Custom Mode</h3>
+            <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Atur ukuran huruf, jumlah baris tampilan, dan durasi tes sesuai keinginan.</p>
+          </div>
+          <span class="text-xs font-bold text-zinc-300 flex items-center gap-1">Pengaturan <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- 2. VIEW: ARENA TYPING TEST / PRACTICE -->
+    <div id="view-typing" class="hidden space-y-6 max-w-4xl mx-auto w-full">
       
-      <!-- Welcome Header -->
-      <div class="text-center max-w-2xl mx-auto space-y-3">
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Pilih Mode Latihan Mengetik</h2>
-        <p class="text-gray-400 text-sm">Tingkatkan kecepatan dan akurasi mengetik Anda dengan berbagai opsi tantangan interaktif di bawah ini.</p>
-      </div>
-
-      <!-- Grid Cards (Sesuai Referensi Visual) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
-        
-        <!-- CARD 1: Typing Test -->
-        <div onclick="selectMode('typing-test')" class="neon-card cursor-pointer p-6 flex flex-col justify-between group">
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <div class="p-3 bg-amber-500/10 text-amber-400 rounded-2xl border border-amber-500/30 group-hover:scale-110 transition duration-300">
-                <i class="fa-solid fa-stopwatch text-2xl"></i>
-              </div>
-              <span class="text-[10px] font-bold px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30">30s / 60s</span>
-            </div>
-            <h3 class="text-xl font-bold text-white group-hover:text-amber-400 transition">Typing Test</h3>
-            <p class="text-xs text-gray-400 leading-relaxed">
-              Tes kecepatan standar dengan durasi terukur dan kosakata Bahasa Indonesia sehari-hari yang mudah dipahami.
-            </p>
-          </div>
-          <div class="mt-6 flex items-center justify-between text-xs text-amber-400 font-semibold pt-4 border-t border-gray-800/80">
-            <span>Mulai Tes Standar</span>
-            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
-          </div>
+      <!-- Stats Bar -->
+      <div class="grid grid-cols-3 gap-4 text-center">
+        <div class="dark-card p-4 rounded-xl">
+          <span class="block text-[11px] uppercase text-zinc-500 font-bold mb-1">Waktu</span>
+          <span id="timer-display" class="text-2xl font-mono font-bold text-white">30</span>
         </div>
-
-        <!-- CARD 2: Competition -->
-        <div onclick="selectMode('competition')" class="neon-card cursor-pointer p-6 flex flex-col justify-between group">
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <div class="p-3 bg-yellow-500/10 text-yellow-400 rounded-2xl border border-yellow-500/30 group-hover:scale-110 transition duration-300">
-                <i class="fa-solid fa-trophy text-2xl"></i>
-              </div>
-              <span class="text-[10px] font-bold px-2.5 py-1 bg-yellow-500/20 text-yellow-300 rounded-full border border-yellow-500/30">Papan Skor</span>
-            </div>
-            <h3 class="text-xl font-bold text-white group-hover:text-yellow-400 transition">Competition</h3>
-            <p class="text-xs text-gray-400 leading-relaxed">
-              Mode kompetisi cepat 60 detik untuk memecahkan rekor skor tertinggi pribadi dan mencetak WPM maksimal.
-            </p>
-          </div>
-          <div class="mt-6 flex items-center justify-between text-xs text-yellow-400 font-semibold pt-4 border-t border-gray-800/80">
-            <span>Adu Skor Tertinggi</span>
-            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
-          </div>
+        <div class="dark-card p-4 rounded-xl">
+          <span class="block text-[11px] uppercase text-zinc-500 font-bold mb-1">WPM</span>
+          <span id="wpm-display" class="text-2xl font-mono font-bold text-white">0</span>
         </div>
-
-        <!-- CARD 3: Multiplayer -->
-        <div onclick="selectMode('multiplayer')" class="neon-card cursor-pointer p-6 flex flex-col justify-between group">
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <div class="p-3 bg-amber-400/10 text-amber-300 rounded-2xl border border-amber-400/30 group-hover:scale-110 transition duration-300">
-                <i class="fa-solid fa-users text-2xl"></i>
-              </div>
-              <span class="text-[10px] font-bold px-2.5 py-1 bg-amber-400/20 text-amber-200 rounded-full border border-amber-400/30">Real-Time P2P</span>
-            </div>
-            <h3 class="text-xl font-bold text-white group-hover:text-amber-300 transition">Multiplayer Room</h3>
-            <p class="text-xs text-gray-400 leading-relaxed">
-              Buat room balapan mengetik langsung atau gabung lewat link undangan untuk tanding cepat bersama teman.
-            </p>
-          </div>
-          <div class="mt-6 flex items-center justify-between text-xs text-amber-300 font-semibold pt-4 border-t border-gray-800/80">
-            <span>Buat / Gabung Room</span>
-            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
-          </div>
-        </div>
-
-        <!-- CARD 4: Text Practice -->
-        <div onclick="selectMode('text-practice')" class="neon-card cursor-pointer p-6 flex flex-col justify-between group">
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <div class="p-3 bg-amber-500/10 text-amber-400 rounded-2xl border border-amber-500/30 group-hover:scale-110 transition duration-300">
-                <i class="fa-solid fa-align-left text-2xl"></i>
-              </div>
-              <span class="text-[10px] font-bold px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30">Paragraf Utuh</span>
-            </div>
-            <h3 class="text-xl font-bold text-white group-hover:text-amber-400 transition">Text Practice</h3>
-            <p class="text-xs text-gray-400 leading-relaxed">
-              Latihan mengetik paragraf cerita atau artikel penuh untuk melatih konsistensi ritme dan tanda baca.
-            </p>
-          </div>
-          <div class="mt-6 flex items-center justify-between text-xs text-amber-400 font-semibold pt-4 border-t border-gray-800/80">
-            <span>Latihan Paragraf</span>
-            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
-          </div>
-        </div>
-
-        <!-- CARD 5: Custom Mode -->
-        <div onclick="selectMode('custom-mode')" class="neon-card cursor-pointer p-6 flex flex-col justify-between group md:col-span-2 lg:col-span-2">
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <div class="p-3 bg-yellow-400/10 text-yellow-300 rounded-2xl border border-yellow-400/30 group-hover:scale-110 transition duration-300">
-                <i class="fa-solid fa-sliders text-2xl"></i>
-              </div>
-              <span class="text-[10px] font-bold px-2.5 py-1 bg-yellow-400/20 text-yellow-200 rounded-full border border-yellow-400/30">Pengaturan Lengkap</span>
-            </div>
-            <h3 class="text-xl font-bold text-white group-hover:text-yellow-300 transition">Custom Mode</h3>
-            <p class="text-xs text-gray-400 leading-relaxed">
-              Atur durasi tes sesukamu, sesuaikan ukuran teks (Kecil hingga Extra Besar), serta atur tampilan baris teks (1 baris, 2 baris, 3 baris, atau bebas).
-            </p>
-          </div>
-          <div class="mt-6 flex items-center justify-between text-xs text-yellow-300 font-semibold pt-4 border-t border-gray-800/80">
-            <span>Buka Pengaturan Kustom</span>
-            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- ==================== VIEW 2: ARENA LOMBA / TYPING ENGINE ==================== -->
-    <section id="view-typing-arena" class="hidden space-y-6">
-      
-      <!-- Top Control Bar (Kembali, Mode Controls & Settings Bar) -->
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-gray-900/90 border border-gray-800">
-        
-        <!-- Back Button & Mode Name -->
-        <div class="flex items-center gap-3 w-full sm:w-auto">
-          <button onclick="switchView('dashboard')" class="px-3.5 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-bold transition flex items-center gap-2">
-            <i class="fa-solid fa-arrow-left"></i> Menu Utama
-          </button>
-          <span id="arena-title" class="text-sm font-extrabold gold-gradient-text uppercase">Typing Test</span>
-        </div>
-
-        <!-- Dynamic Controls (Durasi & Custom Options) -->
-        <div id="arena-controls" class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end text-xs">
-          
-          <!-- Duration Options (for Typing Test & Competition) -->
-          <div id="duration-selector" class="flex items-center bg-gray-950 p-1 rounded-xl border border-gray-800">
-            <button onclick="setDuration(15)" class="time-btn px-3 py-1 rounded-lg font-bold text-gray-400 hover:text-amber-400 transition" data-time="15">15s</button>
-            <button onclick="setDuration(30)" class="time-btn px-3 py-1 rounded-lg font-bold text-gray-400 hover:text-amber-400 transition" data-time="30">30s</button>
-            <button onclick="setDuration(60)" class="time-btn px-3 py-1 rounded-lg font-bold text-amber-400 bg-gray-800" data-time="60">60s</button>
-          </div>
-
-          <!-- Font Size Controls -->
-          <div class="flex items-center bg-gray-950 p-1 rounded-xl border border-gray-800">
-            <span class="px-2 text-gray-500 font-semibold"><i class="fa-solid fa-text-height"></i></span>
-            <button onclick="setFontSize('text-base')" class="font-size-btn px-2.5 py-1 rounded-lg text-xs text-gray-400 hover:text-amber-400">A</button>
-            <button onclick="setFontSize('text-xl')" class="font-size-btn px-2.5 py-1 rounded-lg text-sm text-amber-400 font-bold bg-gray-800">A</button>
-            <button onclick="setFontSize('text-2xl')" class="font-size-btn px-2.5 py-1 rounded-lg text-base text-gray-400 hover:text-amber-400">A</button>
-          </div>
-
-          <!-- Line View Option -->
-          <div class="flex items-center bg-gray-950 p-1 rounded-xl border border-gray-800">
-            <select id="line-view-select" onchange="setLineView(this.value)" class="bg-transparent text-gray-300 font-semibold focus:outline-none px-2 py-0.5">
-              <option value="lines-1" class="bg-gray-900 text-white">1 Baris</option>
-              <option value="lines-2" class="bg-gray-900 text-white">2 Baris</option>
-              <option value="lines-3" selected class="bg-gray-900 text-white">3 Baris</option>
-              <option value="lines-free" class="bg-gray-900 text-white">Bebas / Auto</option>
-            </select>
-          </div>
-
+        <div class="dark-card p-4 rounded-xl">
+          <span class="block text-[11px] uppercase text-zinc-500 font-bold mb-1">Akurasi</span>
+          <span id="accuracy-display" class="text-2xl font-mono font-bold text-emerald-400">100%</span>
         </div>
       </div>
 
-      <!-- Live Dashboard Realtime Stats -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div class="p-4 rounded-2xl bg-gray-900/60 border border-gray-800/80 text-center">
-          <p class="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Waktu Sisa</p>
-          <p id="stat-timer" class="text-2xl sm:text-3xl font-extrabold text-amber-400 font-mono-code mt-1">60s</p>
-        </div>
-        <div class="p-4 rounded-2xl bg-gray-900/60 border border-gray-800/80 text-center">
-          <p class="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Kecepatan (WPM)</p>
-          <p id="stat-wpm" class="text-2xl sm:text-3xl font-extrabold text-white font-mono-code mt-1">0</p>
-        </div>
-        <div class="p-4 rounded-2xl bg-gray-900/60 border border-gray-800/80 text-center">
-          <p class="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Akurasi</p>
-          <p id="stat-accuracy" class="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono-code mt-1">100%</p>
-        </div>
-        <div class="p-4 rounded-2xl bg-gray-900/60 border border-gray-800/80 text-center">
-          <p class="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Karakter Tepat</p>
-          <p id="stat-chars" class="text-2xl sm:text-3xl font-extrabold text-amber-200 font-mono-code mt-1">0</p>
+      <!-- Text Container Box -->
+      <div class="dark-card p-6 rounded-2xl relative shadow-xl">
+        <div id="text-container" class="font-mono text-lg leading-relaxed select-none h-[130px] overflow-hidden flex flex-wrap content-start custom-scrollbar"></div>
+        <input type="text" id="hidden-input" class="absolute opacity-0 pointer-events-none" autofocus oninput="handleTyping(event)" onkeydown="handleKeyDown(event)">
+
+        <!-- Overlay Mulai -->
+        <div id="start-overlay" onclick="focusInput()" class="absolute inset-0 bg-[#0d0d0d]/90 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center cursor-pointer transition p-4 text-center z-10">
+          <i class="fa-solid fa-hand-pointer text-3xl text-zinc-400 mb-2 animate-bounce"></i>
+          <span class="text-xs font-bold text-zinc-300">Klik di sini atau mulai mengetik untuk memulai tes</span>
         </div>
       </div>
 
-      <!-- MAIN TYPING BOX ARENA -->
-      <div class="neon-card p-6 sm:p-8 relative">
-        
-        <!-- Interactive Typing Box Container -->
-        <div id="typing-viewport" class="font-mono-code text-xl leading-relaxed select-none overflow-hidden h-36 flex flex-wrap content-start custom-scrollbar transition-all" onclick="focusTypingInput()">
-          <div id="text-container" class="w-full flex flex-wrap">
-            <!-- Dynamic Words Rendered Here -->
-          </div>
-        </div>
-
-        <!-- Hidden Typing Input -->
-        <input type="text" id="typing-input" class="absolute opacity-0 pointer-events-none" autocomplete="off" oninput="handleTypingInput(event)" onkeydown="handleTypingKeyDown(event)">
-
-        <!-- Overlay Click to Focus Prompt -->
-        <div id="focus-prompt" onclick="focusTypingInput()" class="absolute inset-0 bg-gray-950/80 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center cursor-pointer transition">
-          <i class="fa-solid fa-i-cursor text-3xl text-amber-400 animate-bounce mb-2"></i>
-          <p class="text-sm font-bold text-amber-200">Klik di sini atau tekan sembarang tombol untuk mulai mengetik</p>
-        </div>
-
-      </div>
-
-      <!-- Refresh / Reset Action Button -->
-      <div class="text-center pt-2">
-        <button onclick="resetCurrentGame()" class="px-6 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 border border-amber-500/40 text-amber-400 text-xs font-bold transition inline-flex items-center gap-2">
-          <i class="fa-solid fa-arrows-rotate"></i> Muat Ulang Teks
+      <div class="text-center">
+        <button onclick="resetTest()" class="px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-semibold rounded-xl text-xs transition">
+          <i class="fa-solid fa-rotate-right mr-1.5"></i> Ulangi Tes
         </button>
       </div>
+    </div>
 
-    </section>
 
-
-    <!-- ==================== VIEW 3: MULTIPLAYER LOBBY & BATTLE ==================== -->
-    <section id="view-multiplayer" class="hidden space-y-6">
+    <!-- 3. VIEW: MULTIPLAYER LOBBY & ARENA -->
+    <div id="view-multiplayer" class="hidden space-y-6 max-w-4xl mx-auto w-full">
       
-      <div class="flex items-center justify-between p-4 rounded-2xl bg-gray-900/90 border border-gray-800">
-        <button onclick="switchView('dashboard')" class="px-3.5 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-bold transition flex items-center gap-2">
-          <i class="fa-solid fa-arrow-left"></i> Menu Utama
-        </button>
-        <span class="text-sm font-extrabold gold-gradient-text uppercase">Multiplayer Battle Room</span>
-        <div class="flex items-center gap-2 text-xs">
-          <span class="text-gray-400">Status Server:</span>
-          <span id="mp-server-status" class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[11px] border border-amber-500/30">Menghubungkan...</span>
-        </div>
-      </div>
-
-      <!-- Room Setup Grid (Jika belum ada room) -->
-      <div id="mp-setup-section" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <!-- Create Room -->
-        <div class="neon-card p-6 space-y-4">
-          <div class="flex items-center gap-3">
-            <div class="p-2.5 bg-amber-500/10 text-amber-400 rounded-xl border border-amber-500/30">
-              <i class="fa-solid fa-plus-circle text-xl"></i>
-            </div>
-            <div>
-              <h3 class="text-base font-bold text-white">Buat Room Pertandingan (Host)</h3>
-              <p class="text-xs text-gray-400">Jadilah Host dan undang teman untuk adu kecepatan langsung.</p>
-            </div>
-          </div>
-          <button id="mp-create-btn" onclick="mpCreateRoom()" disabled class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-extrabold text-xs transition disabled:opacity-50 disabled:cursor-not-allowed">
-            BUAT ROOM BARU
+      <!-- Lobby Setup -->
+      <div id="mp-lobby" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="dark-card p-6 rounded-2xl space-y-3">
+          <h3 class="text-sm font-bold text-white uppercase"><i class="fa-solid fa-plus-circle text-zinc-400 mr-2"></i> Buat Room Baru</h3>
+          <p class="text-xs text-zinc-400">Buat room pertandingan dan dapatkan link undangan untuk teman.</p>
+          <button onclick="createRoom()" id="create-room-btn" class="w-full py-2.5 bg-zinc-200 hover:bg-white text-zinc-950 font-bold rounded-xl text-xs transition">
+            BUAT ROOM
           </button>
         </div>
 
-        <!-- Join Room -->
-        <div class="neon-card p-6 space-y-4">
-          <div class="flex items-center gap-3">
-            <div class="p-2.5 bg-yellow-500/10 text-yellow-400 rounded-xl border border-yellow-500/30">
-              <i class="fa-solid fa-right-to-bracket text-xl"></i>
-            </div>
-            <div>
-              <h3 class="text-base font-bold text-white">Gabung Room Teman</h3>
-              <p class="text-xs text-gray-400">Masukkan ID Room atau salin link dari teman Anda.</p>
-            </div>
-          </div>
+        <div class="dark-card p-6 rounded-2xl space-y-3">
+          <h3 class="text-sm font-bold text-white uppercase"><i class="fa-solid fa-right-to-bracket text-zinc-400 mr-2"></i> Gabung Room</h3>
           <div class="flex gap-2">
-            <input type="text" id="mp-join-input" placeholder="Tempel ID Room Host di sini..." class="flex-1 bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-amber-200 font-mono focus:outline-none focus:border-amber-500">
-            <button onclick="mpJoinRoomManual()" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs transition">
+            <input type="text" id="join-room-input" placeholder="Masukkan Kode Room..." class="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-zinc-500 font-mono">
+            <button onclick="joinRoomManual()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl text-xs transition">
               GABUNG
             </button>
           </div>
+          <p class="text-[11px] text-zinc-500">Atau cukup buka link undangan dari teman Anda.</p>
         </div>
-
       </div>
 
-      <!-- Active Multiplayer Battle Area -->
-      <div id="mp-battle-section" class="hidden space-y-6">
-        
-        <!-- Invite Bar -->
-        <div class="neon-card p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-2 w-full sm:w-auto">
-            <span class="text-xs text-amber-400 font-bold whitespace-nowrap">LINK UNDANGAN:</span>
-            <input type="text" id="mp-share-link" readonly class="bg-gray-950 border border-gray-800 rounded-xl px-3 py-1.5 text-xs text-amber-200 font-mono w-full sm:w-80 focus:outline-none">
-            <button onclick="copyShareLink()" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold rounded-xl text-xs whitespace-nowrap transition">
-              <i class="fa-solid fa-copy mr-1"></i> Salin Link
+      <!-- MP Battle Arena (Hidden Sblm Masuk Room) -->
+      <div id="mp-arena" class="hidden space-y-4">
+        <div class="dark-card p-4 rounded-xl flex flex-col md:flex-row items-center justify-between gap-3">
+          <div class="flex items-center gap-2 w-full md:w-auto">
+            <span class="text-xs text-zinc-400 font-bold">LINK ROOM:</span>
+            <input type="text" id="share-link-input" readonly class="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-1.5 text-xs text-zinc-300 font-mono w-full md:w-64 focus:outline-none">
+            <button onclick="copyShareLink()" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl text-xs whitespace-nowrap transition">
+              Salin Link
             </button>
           </div>
           <div class="flex items-center gap-3">
-            <span id="mp-room-badge" class="px-3 py-1 bg-amber-950 text-amber-300 border border-amber-500/50 rounded-lg text-xs font-bold">MENUNGGU TEMAN...</span>
-            <button id="mp-start-btn" onclick="mpStartBattle()" class="hidden px-5 py-1.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-white text-gray-950 font-extrabold rounded-xl text-xs transition shadow-lg">
-              MULAILAH LOMBA!
+            <span id="mp-status-badge" class="px-3 py-1 bg-zinc-900 border border-zinc-700 text-zinc-300 rounded-lg text-xs font-bold">MENUNGGU LAWAN...</span>
+            <button id="start-battle-btn" onclick="startBattle()" class="hidden px-4 py-1.5 bg-zinc-200 hover:bg-white text-zinc-950 font-bold rounded-xl text-xs transition">
+              MULAI LOMBA
             </button>
           </div>
         </div>
 
-        <!-- Live Scoreboard Bars -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="neon-card p-4 space-y-2">
+        <!-- Progress Bar Pemain -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="dark-card p-4 rounded-xl space-y-2">
             <div class="flex justify-between items-center text-xs font-bold">
-              <span class="text-amber-300"><i class="fa-solid fa-user mr-1"></i> SAYA</span>
-              <span id="mp-my-wpm" class="text-amber-400 font-mono text-base">0 WPM</span>
+              <span class="text-zinc-300">SAYA</span>
+              <span id="my-mp-wpm" class="text-white font-mono">0 WPM</span>
             </div>
-            <div class="w-full bg-gray-950 rounded-full h-3 overflow-hidden border border-gray-800">
-              <div id="mp-my-progress" class="bg-gradient-to-r from-amber-500 to-yellow-300 h-full w-0 transition-all duration-300"></div>
+            <div class="w-full bg-zinc-900 rounded-full h-2.5 overflow-hidden border border-zinc-800">
+              <div id="my-mp-progress" class="bg-white h-full w-0 transition-all duration-300"></div>
             </div>
           </div>
-
-          <div class="neon-card p-4 space-y-2">
+          <div class="dark-card p-4 rounded-xl space-y-2">
             <div class="flex justify-between items-center text-xs font-bold">
-              <span class="text-amber-300"><i class="fa-solid fa-user-ninja mr-1"></i> LAWAN</span>
-              <span id="mp-opponent-wpm" class="text-amber-400 font-mono text-base">0 WPM</span>
+              <span class="text-zinc-300">LAWAN</span>
+              <span id="opp-mp-wpm" class="text-white font-mono">0 WPM</span>
             </div>
-            <div class="w-full bg-gray-950 rounded-full h-3 overflow-hidden border border-gray-800">
-              <div id="mp-opponent-progress" class="bg-gradient-to-r from-amber-500 to-white h-full w-0 transition-all duration-300"></div>
+            <div class="w-full bg-zinc-900 rounded-full h-2.5 overflow-hidden border border-zinc-800">
+              <div id="opp-mp-progress" class="bg-zinc-500 h-full w-0 transition-all duration-300"></div>
             </div>
           </div>
         </div>
 
+        <!-- Kotak Mengetik MP -->
+        <div class="dark-card p-6 rounded-2xl relative shadow-xl">
+          <div id="mp-text-container" class="font-mono text-lg leading-relaxed select-none h-[120px] overflow-hidden flex flex-wrap content-start custom-scrollbar"></div>
+          <input type="text" id="mp-hidden-input" class="absolute opacity-0 pointer-events-none" autofocus oninput="handleMpTyping(event)" onkeydown="handleMpKeyDown(event)" disabled>
+          
+          <div id="mp-overlay" class="absolute inset-0 bg-[#0d0d0d]/95 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center p-4 text-center z-10">
+            <span id="mp-overlay-text" class="text-xs font-bold text-zinc-400">Menunggu Host Memulai Pertandingan...</span>
+          </div>
+        </div>
       </div>
 
-    </section>
+    </div>
 
-    <!-- ==================== MODAL RESULT STATS ==================== -->
-    <div id="result-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div class="neon-card max-w-md w-full p-6 text-center space-y-6 animate-scaleUp">
-        <div class="p-3 bg-amber-500/10 text-amber-400 rounded-2xl border border-amber-500/30 w-16 h-16 mx-auto flex items-center justify-center">
-          <i class="fa-solid fa-flag-checkered text-3xl"></i>
-        </div>
+
+    <!-- 4. VIEW: CUSTOM SETTINGS -->
+    <div id="view-custom-settings" class="hidden space-y-6 max-w-xl mx-auto w-full">
+      <div class="dark-card p-6 rounded-2xl space-y-6">
+        <h3 class="text-base font-bold text-white border-b border-zinc-800 pb-3">Pengaturan Tampilan</h3>
         
-        <div>
-          <h3 class="text-2xl font-black text-white">Hasil Pengetikan Anda</h3>
-          <p id="result-subtitle" class="text-xs text-gray-400 mt-1">Latihan Tes Standar Selesai</p>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3 font-mono-code">
-          <div class="p-3 rounded-xl bg-gray-950 border border-gray-800">
-            <p class="text-[10px] text-gray-400">Kecepatan</p>
-            <p id="res-wpm" class="text-2xl font-extrabold text-amber-400 mt-0.5">0 WPM</p>
-          </div>
-          <div class="p-3 rounded-xl bg-gray-950 border border-gray-800">
-            <p class="text-[10px] text-gray-400">Akurasi</p>
-            <p id="res-acc" class="text-2xl font-extrabold text-emerald-400 mt-0.5">100%</p>
-          </div>
-          <div class="p-3 rounded-xl bg-gray-950 border border-gray-800">
-            <p class="text-[10px] text-gray-400">Total Karakter</p>
-            <p id="res-chars" class="text-xl font-extrabold text-amber-200 mt-0.5">0</p>
-          </div>
-          <div class="p-3 rounded-xl bg-gray-950 border border-gray-800">
-            <p class="text-[10px] text-gray-400">Salah Ketik</p>
-            <p id="res-errors" class="text-xl font-extrabold text-red-400 mt-0.5">0</p>
+        <div class="space-y-2">
+          <label class="text-xs text-zinc-400 font-bold block">Ukuran Huruf</label>
+          <div class="grid grid-cols-4 gap-2">
+            <button onclick="changeFontSize('sm')" id="fs-sm" class="py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-zinc-300">Kecil</button>
+            <button onclick="changeFontSize('base')" id="fs-base" class="py-2 bg-white text-zinc-950 font-bold rounded-xl text-xs">Normal</button>
+            <button onclick="changeFontSize('lg')" id="fs-lg" class="py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-zinc-300">Besar</button>
+            <button onclick="changeFontSize('xl')" id="fs-xl" class="py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-zinc-300">Extra</button>
           </div>
         </div>
 
-        <div class="flex gap-3">
-          <button onclick="closeResultModal()" class="flex-1 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold text-xs transition">
-            Tutup
-          </button>
-          <button onclick="closeResultModal(); resetCurrentGame();" class="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-extrabold text-xs transition">
-            Coba Lagi <i class="fa-solid fa-arrow-rotate-right ml-1"></i>
-          </button>
+        <div class="space-y-2">
+          <label class="text-xs text-zinc-400 font-bold block">Mode Baris Tampilan</label>
+          <div class="grid grid-cols-4 gap-2">
+            <button onclick="changeLineMode(1)" id="lm-1" class="py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-zinc-300">1 Baris</button>
+            <button onclick="changeLineMode(2)" id="lm-2" class="py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-zinc-300">2 Baris</button>
+            <button onclick="changeLineMode(3)" id="lm-3" class="py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-zinc-300">3 Baris</button>
+            <button onclick="changeLineMode(0)" id="lm-0" class="py-2 bg-white text-zinc-950 font-bold rounded-xl text-xs">Bebas</button>
+          </div>
         </div>
+
+        <button onclick="switchView('dashboard')" class="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl text-xs transition">
+          Simpan & Kembali
+        </button>
       </div>
     </div>
 
   </main>
 
-  <!-- FOOTER -->
-  <footer class="border-t border-gray-900 bg-gray-950 py-4 text-center text-xs text-gray-500">
-    Typing Master Suite &bull; Crafted for Maximum Speed & Accuracy
+  <!-- MODAL TEXT PRACTICE -->
+  <div id="custom-text-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="dark-card p-6 rounded-2xl max-w-lg w-full space-y-4">
+      <h3 class="text-base font-bold text-white">Masukkan Teks Latihan Anda</h3>
+      <textarea id="custom-text-input" rows="4" placeholder="Ketik atau tempel paragraf latihan di sini..." class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-zinc-500 font-mono"></textarea>
+      <div class="flex justify-end gap-2">
+        <button onclick="closeCustomTextModal()" class="px-4 py-2 bg-zinc-900 border border-zinc-700 text-zinc-300 font-bold rounded-xl text-xs">Batal</button>
+        <button onclick="startCustomTextPractice()" class="px-4 py-2 bg-white text-zinc-950 font-bold rounded-xl text-xs">Mulai Latihan</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="max-w-6xl w-full mx-auto text-center text-xs text-zinc-600 pt-6 border-t border-zinc-900">
+    Tribun Typing &bull; Clean Black Edition
   </footer>
 
-  <!-- SCRIPT ENGINE -->
   <script>
-    // --- KOSAKATA BAHASA INDONESIA MUDAH ---
-    const easyIndonesianWords = [
+    const indonesianWords = [
       "makan", "minum", "tidur", "jalan", "rumah", "mobil", "motor", "buku", "meja", "kursi",
       "pagi", "siang", "malam", "sore", "air", "api", "batu", "kayu", "daun", "bunga",
       "anak", "orang", "bapak", "ibu", "teman", "kerja", "sekolah", "pasar", "toko", "uang",
       "baju", "celana", "sepatu", "topi", "lampu", "pintu", "jendela", "kertas", "pulpen",
       "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh",
-      "hari", "bulan", "tahun", "kota", "desa", "laut", "gunung", "sawah", "sungai", "pohon",
-      "kucing", "anjing", "burung", "ikan", "makanan", "minuman", "senang", "sedih", "cepat"
+      "teknologi", "komputer", "jaringan", "program", "belajar", "pintar", "cepat", "hebat"
     ];
 
-    const practiceParagraphs = [
-      "Mengetik dengan cepat dan akurat memerlukan latihan yang konsisten setiap hari. Pastikan posisi duduk Anda nyaman dan jemari berada pada posisi tombol asal yang benar.",
-      "Teknologi berkembang sangat pesat di era digital saat ini. Keterampilan mengetik sepuluh jari menjadi modal penting untuk meningkatkan produktivitas kerja sehari-hari.",
-      "Keberhasilan tidak datang secara instan melainkan hasil dari usaha pantang menyerah. Teruslah berlatih mengetik hingga Anda mencapai kecepatan target yang diinginkan."
-    ];
-
-    // --- STATE VARIABEL ---
-    let currentMode = 'typing-test'; // typing-test, competition, multiplayer, text-practice, custom-mode
-    let testDuration = 60;
-    let timerLeft = 60;
-    let timerInterval = null;
-    let isTestRunning = false;
-
-    let generatedWords = [];
+    let testDuration = 30;
+    let timeLeft = 30;
+    let timer = null;
+    let isStarted = false;
+    let isFinished = false;
     let charIndex = 0;
     let correctChars = 0;
     let totalTyped = 0;
-    let totalErrors = 0;
     let allSpans = [];
 
-    let currentFontSize = 'text-xl';
-    let currentLineView = 'lines-3';
-
-    // PeerJS State
-    let peer = null;
-    let conn = null;
-    let isHost = false;
-
-    // --- INITIALIZATION ---
-    window.onload = () => {
-      initPeerJS();
-      checkURLParams();
-    };
-
+    // NAVIGASI VIEW
     function switchView(viewName) {
       document.getElementById('view-dashboard').classList.add('hidden');
-      document.getElementById('view-typing-arena').classList.add('hidden');
+      document.getElementById('view-typing').classList.add('hidden');
       document.getElementById('view-multiplayer').classList.add('hidden');
+      document.getElementById('view-custom-settings').classList.add('hidden');
 
       if (viewName === 'dashboard') {
         document.getElementById('view-dashboard').classList.remove('hidden');
-        document.getElementById('nav-mode-badge').classList.add('hidden');
-        clearInterval(timerInterval);
-        isTestRunning = false;
-      } else if (viewName === 'arena') {
-        document.getElementById('view-typing-arena').classList.remove('hidden');
-        document.getElementById('nav-mode-badge').classList.remove('hidden');
+        resetTest();
+      } else if (viewName === 'typing') {
+        document.getElementById('view-typing').classList.remove('hidden');
       } else if (viewName === 'multiplayer') {
         document.getElementById('view-multiplayer').classList.remove('hidden');
-        document.getElementById('nav-mode-badge').classList.remove('hidden');
-        document.getElementById('current-mode-title').innerText = "Multiplayer";
+        initMultiplayer();
+      } else if (viewName === 'custom-settings') {
+        document.getElementById('view-custom-settings').classList.remove('hidden');
       }
     }
 
-    function selectMode(modeKey) {
-      currentMode = modeKey;
-      switchView('arena');
-
-      const titleMap = {
-        'typing-test': 'Typing Test Standar',
-        'competition': 'Competition Mode',
-        'text-practice': 'Text Practice (Paragraf)',
-        'custom-mode': 'Custom Practice Mode'
-      };
-
-      if (modeKey === 'multiplayer') {
-        switchView('multiplayer');
-        return;
-      }
-
-      document.getElementById('arena-title').innerText = titleMap[modeKey] || 'Typing Practice';
-      document.getElementById('current-mode-title').innerText = titleMap[modeKey] || 'Practice';
-
-      resetCurrentGame();
+    // TYPING TEST LOGIC
+    function startTypingTestMode(duration) {
+      testDuration = duration;
+      timeLeft = duration;
+      document.getElementById('timer-display').innerText = timeLeft;
+      switchView('typing');
+      generateWords(40);
     }
 
-    function setDuration(seconds) {
-      testDuration = seconds;
-      timerLeft = seconds;
-      document.querySelectorAll('.time-btn').forEach(btn => {
-        if (parseInt(btn.getAttribute('data-time')) === seconds) {
-          btn.className = "time-btn px-3 py-1 rounded-lg font-bold text-amber-400 bg-gray-800";
-        } else {
-          btn.className = "time-btn px-3 py-1 rounded-lg font-bold text-gray-400 hover:text-amber-400 transition";
-        }
-      });
-      resetCurrentGame();
-    }
-
-    function setFontSize(sizeClass) {
-      currentFontSize = sizeClass;
-      const viewport = document.getElementById('typing-viewport');
-      viewport.className = viewport.className.replace(/text-(base|xl|2xl)/g, sizeClass);
-    }
-
-    function setLineView(viewVal) {
-      currentLineView = viewVal;
-      const viewport = document.getElementById('typing-viewport');
-      if (viewVal === 'lines-1') viewport.style.height = '2.5rem';
-      else if (viewVal === 'lines-2') viewport.style.height = '5rem';
-      else if (viewVal === 'lines-3') viewport.style.height = '8rem';
-      else viewport.style.height = 'auto';
-    }
-
-    function resetCurrentGame() {
-      clearInterval(timerInterval);
-      isTestRunning = false;
-      timerLeft = testDuration;
-      charIndex = 0;
-      correctChars = 0;
-      totalTyped = 0;
-      totalErrors = 0;
-
-      document.getElementById('stat-timer').innerText = timerLeft + 's';
-      document.getElementById('stat-wpm').innerText = '0';
-      document.getElementById('stat-accuracy').innerText = '100%';
-      document.getElementById('stat-chars').innerText = '0';
-
-      document.getElementById('focus-prompt').style.display = 'flex';
-
-      // Generate Words
-      if (currentMode === 'text-practice') {
-        const paragraph = practiceParagraphs[Math.floor(Math.random() * practiceParagraphs.length)];
-        generatedWords = paragraph.split(' ');
-      } else {
-        generatedWords = [];
-        for (let i = 0; i < 80; i++) {
-          generatedWords.push(easyIndonesianWords[Math.floor(Math.random() * easyIndonesianWords.length)]);
-        }
-      }
-
-      renderWords();
-    }
-
-    function renderWords() {
-      const container = document.getElementById('text-container');
-      container.innerHTML = '';
+    function generateWords(count) {
+      const textContainer = document.getElementById('text-container');
+      textContainer.innerHTML = '';
       allSpans = [];
+      charIndex = 0;
 
-      generatedWords.forEach((word) => {
-        const wordBox = document.createElement('div');
-        wordBox.className = 'word-box';
-
+      for (let i = 0; i < count; i++) {
+        const word = indonesianWords[Math.floor(Math.random() * indonesianWords.length)];
         for (let j = 0; j < word.length; j++) {
           const span = document.createElement('span');
           span.innerText = word[j];
           span.className = 'char-default';
-          wordBox.appendChild(span);
+          textContainer.appendChild(span);
           allSpans.push(span);
         }
+        const space = document.createElement('span');
+        space.innerText = ' ';
+        space.className = 'char-default';
+        textContainer.appendChild(space);
+        allSpans.push(space);
+      }
+      if (allSpans.length > 0) allSpans[0].classList.add('char-current');
+    }
 
-        const spaceSpan = document.createElement('span');
-        spaceSpan.innerText = ' ';
-        spaceSpan.className = 'char-default';
-        wordBox.appendChild(spaceSpan);
-        allSpans.push(spaceSpan);
+    function focusInput() {
+      document.getElementById('hidden-input').focus();
+      document.getElementById('start-overlay').style.display = 'none';
+    }
 
-        container.appendChild(wordBox);
-      });
-
-      if (allSpans.length > 0) {
-        allSpans[0].classList.add('char-current');
+    function startTimer() {
+      if (!isStarted) {
+        isStarted = true;
+        timer = setInterval(() => {
+          if (timeLeft > 0) {
+            timeLeft--;
+            document.getElementById('timer-display').innerText = timeLeft;
+            calculateStats();
+          } else {
+            endTest();
+          }
+        }, 1000);
       }
     }
 
-    function focusTypingInput() {
-      document.getElementById('focus-prompt').style.display = 'none';
-      const input = document.getElementById('typing-input');
-      input.focus();
-    }
-
-    function handleTypingKeyDown(e) {
+    function handleKeyDown(e) {
+      if (isFinished) return;
+      startTimer();
       if (e.key === 'Backspace') {
         if (charIndex > 0) {
           charIndex--;
+          totalTyped--;
           allSpans[charIndex].className = 'char-default';
           allSpans.forEach(s => s.classList.remove('char-current'));
           allSpans[charIndex].classList.add('char-current');
@@ -731,172 +400,281 @@
       }
     }
 
-    function handleTypingInput(e) {
-      if (!isTestRunning) {
-        startTimer();
-      }
-
-      const input = document.getElementById('typing-input');
-      const typedVal = input.value;
-      if (!typedVal) return;
-
-      const charTyped = typedVal.slice(-1);
-      input.value = '';
+    function handleTyping(e) {
+      if (isFinished) return;
+      const val = document.getElementById('hidden-input').value;
+      if (!val) return;
+      const charTyped = val.slice(-1);
+      document.getElementById('hidden-input').value = '';
 
       if (charIndex >= allSpans.length) return;
-
       totalTyped++;
-      const targetChar = allSpans[charIndex].innerText;
+      const target = allSpans[charIndex].innerText;
 
       allSpans[charIndex].classList.remove('char-default', 'char-current');
-
-      if (charTyped === targetChar) {
+      if (charTyped === target) {
         allSpans[charIndex].classList.add('char-correct');
         correctChars++;
       } else {
         allSpans[charIndex].classList.add('char-incorrect');
-        totalErrors++;
       }
 
       charIndex++;
-
       if (charIndex < allSpans.length) {
         allSpans[charIndex].classList.add('char-current');
         allSpans[charIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       } else {
-        finishTest();
+        endTest();
       }
-
-      updateLiveStats();
+      calculateStats();
     }
 
-    function startTimer() {
-      isTestRunning = true;
-      timerInterval = setInterval(() => {
-        timerLeft--;
-        document.getElementById('stat-timer').innerText = timerLeft + 's';
-
-        if (timerLeft <= 0) {
-          finishTest();
-        }
-      }, 1000);
-    }
-
-    function updateLiveStats() {
-      const timeElapsed = (testDuration - timerLeft) / 60 || 1/60;
-      const wpm = Math.round((correctChars / 5) / timeElapsed);
+    function calculateStats() {
+      const elapsed = testDuration - timeLeft;
+      if (elapsed === 0) return;
+      const wpm = Math.round((correctChars / 5) / (elapsed / 60));
+      document.getElementById('wpm-display').innerText = wpm >= 0 ? wpm : 0;
       const acc = totalTyped > 0 ? Math.round((correctChars / totalTyped) * 100) : 100;
-
-      document.getElementById('stat-wpm').innerText = Math.max(0, wpm);
-      document.getElementById('stat-accuracy').innerText = acc + '%';
-      document.getElementById('stat-chars').innerText = correctChars;
+      document.getElementById('accuracy-display').innerText = acc + '%';
     }
 
-    function finishTest() {
-      clearInterval(timerInterval);
-      isTestRunning = false;
-
-      const timeElapsed = (testDuration - timerLeft) / 60 || 1/60;
-      const finalWPM = Math.round((correctChars / 5) / timeElapsed);
-      const finalAcc = totalTyped > 0 ? Math.round((correctChars / totalTyped) * 100) : 100;
-
-      document.getElementById('res-wpm').innerText = Math.max(0, finalWPM) + ' WPM';
-      document.getElementById('res-acc').innerText = finalAcc + '%';
-      document.getElementById('res-chars').innerText = correctChars;
-      document.getElementById('res-errors').innerText = totalErrors;
-
-      document.getElementById('result-modal').classList.remove('hidden');
+    function endTest() {
+      isFinished = true;
+      clearInterval(timer);
+      document.getElementById('start-overlay').style.display = 'flex';
+      document.getElementById('start-overlay').querySelector('span').innerText = `Selesai! WPM: ${document.getElementById('wpm-display').innerText} | Akurasi: ${document.getElementById('accuracy-display').innerText}`;
     }
 
-    function closeResultModal() {
-      document.getElementById('result-modal').classList.add('hidden');
+    function resetTest() {
+      clearInterval(timer);
+      isStarted = false;
+      isFinished = false;
+      timeLeft = testDuration;
+      document.getElementById('timer-display').innerText = timeLeft;
+      document.getElementById('wpm-display').innerText = '0';
+      document.getElementById('accuracy-display').innerText = '100%';
+      charIndex = 0;
+      correctChars = 0;
+      totalTyped = 0;
+      document.getElementById('start-overlay').style.display = 'flex';
+      document.getElementById('start-overlay').querySelector('span').innerText = 'Klik di sini atau mulai mengetik untuk memulai tes';
+      generateWords(40);
     }
 
-    // ==================== MULTIPLAYER ENGINE ====================
-    function initPeerJS() {
-      peer = new Peer({
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:global.stun.twilio.com:3478' }
-          ]
-        }
+    // CUSTOM TEXT PRACTICE
+    function openCustomTextModal() { document.getElementById('custom-text-modal').style.display = 'flex'; }
+    function closeCustomTextModal() { document.getElementById('custom-text-modal').style.display = 'none'; }
+    function startCustomTextPractice() {
+      const text = document.getElementById('custom-text-input').value.trim();
+      if (!text) { alert("Masukkan teks terlebih dahulu!"); return; }
+      closeCustomTextModal();
+      switchView('typing');
+      const textContainer = document.getElementById('text-container');
+      textContainer.innerHTML = '';
+      allSpans = [];
+      charIndex = 0;
+      for (let i = 0; i < text.length; i++) {
+        const span = document.createElement('span');
+        span.innerText = text[i];
+        span.className = 'char-default';
+        textContainer.appendChild(span);
+        allSpans.push(span);
+      }
+      if (allSpans.length > 0) allSpans[0].classList.add('char-current');
+    }
+
+    // CUSTOM SETTINGS FONT & LINES
+    function changeFontSize(size) {
+      ['sm', 'base', 'lg', 'xl'].forEach(s => {
+        document.getElementById(`fs-${s}`).className = "py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-zinc-300";
       });
-
-      peer.on('open', (id) => {
-        document.getElementById('mp-server-status').innerText = 'Online (Siap)';
-        const btn = document.getElementById('mp-create-btn');
-        btn.removeAttribute('disabled');
-      });
-
-      peer.on('connection', (c) => {
-        conn = c;
-        setupMPConnection();
-      });
+      document.getElementById(`fs-${size}`).className = "py-2 bg-white text-zinc-950 font-bold rounded-xl text-xs";
+      const tc = document.getElementById('text-container');
+      tc.className = tc.className.replace(/text-(sm|lg|2xl|3xl)/g, '');
+      if (size === 'sm') tc.classList.add('text-sm');
+      if (size === 'base') tc.classList.add('text-lg');
+      if (size === 'lg') tc.classList.add('text-2xl');
+      if (size === 'xl') tc.classList.add('text-3xl');
     }
 
-    function checkURLParams() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const roomId = urlParams.get('room');
-      if (roomId) {
-        switchView('multiplayer');
-        setTimeout(() => mpJoinRoomAuto(roomId), 800);
+    function changeLineMode(lines) {
+      [0, 1, 2, 3].forEach(l => {
+        document.getElementById(`lm-${l}`).className = "py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-zinc-300";
+      });
+      document.getElementById(`lm-${lines}`).className = "py-2 bg-white text-zinc-950 font-bold rounded-xl text-xs";
+      const tc = document.getElementById('text-container');
+      tc.className = tc.className.replace(/h-\[[0-9]+px\]/g, '');
+      if (lines === 1) tc.classList.add('h-[45px]');
+      else if (lines === 2) tc.classList.add('h-[85px]');
+      else if (lines === 3) tc.classList.add('h-[120px]');
+      else tc.classList.add('h-[130px]');
+    }
+
+    // MULTIPLAYER PEERJS LOGIC
+    let peer = null;
+    let conn = null;
+    let isHost = false;
+    let mpCharIndex = 0;
+    let mpCorrect = 0;
+    let mpTotal = 0;
+    let mpSpans = [];
+    let mpStartTime = null;
+
+    function initMultiplayer() {
+      if (!peer) {
+        peer = new Peer();
+        peer.on('open', (id) => {
+          const urlParams = new URLSearchParams(window.location.search);
+          const room = urlParams.get('room');
+          if (room) joinRoomAuto(room);
+        });
+        peer.on('connection', (c) => {
+          conn = c;
+          setupMpConnection();
+        });
       }
     }
 
-    function mpCreateRoom() {
+    function createRoom() {
       isHost = true;
-      const roomId = peer.id;
-      const shareUrl = window.location.origin + window.location.pathname + '?room=' + roomId;
-
-      document.getElementById('mp-share-link').value = shareUrl;
-      document.getElementById('mp-setup-section').classList.add('hidden');
-      document.getElementById('mp-battle-section').classList.remove('hidden');
-      document.getElementById('mp-start-btn').classList.remove('hidden');
+      const link = window.location.origin + window.location.pathname + '?room=' + peer.id;
+      document.getElementById('share-link-input').value = link;
+      document.getElementById('mp-lobby').classList.add('hidden');
+      document.getElementById('mp-arena').classList.remove('hidden');
+      document.getElementById('start-battle-btn').classList.remove('hidden');
+      document.getElementById('mp-status-badge').innerText = "MENUNGGU LAWAN...";
     }
 
-    function mpJoinRoomAuto(targetId) {
+    function joinRoomAuto(code) {
       isHost = false;
-      conn = peer.connect(targetId, { reliable: true });
-
-      document.getElementById('mp-share-link').value = window.location.href;
-      document.getElementById('mp-setup-section').classList.add('hidden');
-      document.getElementById('mp-battle-section').classList.remove('hidden');
-      document.getElementById('mp-room-badge').innerText = "MENGHUBUNGKAN...";
-
-      setupMPConnection();
+      conn = peer.connect(code);
+      document.getElementById('share-link-input').value = window.location.href;
+      document.getElementById('mp-lobby').classList.add('hidden');
+      document.getElementById('mp-arena').classList.remove('hidden');
+      document.getElementById('mp-status-badge').innerText = "MENGHUBUNGKAN...";
+      setupMpConnection();
     }
 
-    function mpJoinRoomManual() {
-      const targetId = document.getElementById('mp-join-input').value.trim();
-      if (targetId) mpJoinRoomAuto(targetId);
+    function joinRoomManual() {
+      const code = document.getElementById('join-room-input').value.trim();
+      if (!code) { alert("Masukkan kode room!"); return; }
+      joinRoomAuto(code);
     }
 
-    function setupMPConnection() {
+    function setupMpConnection() {
+      if (!conn) return;
       conn.on('open', () => {
-        document.getElementById('mp-room-badge').innerText = "TERHUBUNG & SIAP!";
-        document.getElementById('mp-room-badge').className = "px-3 py-1 bg-emerald-950 text-emerald-300 border border-emerald-500/50 rounded-lg text-xs font-bold";
+        document.getElementById('mp-status-badge').innerText = "TERHUBUNG & SIAP!";
+        if (isHost) generateMpWords();
       });
-
       conn.on('data', (data) => {
+        if (data.type === 'words') renderMpWords(data.words);
+        if (data.type === 'start') startMpLocal();
         if (data.type === 'progress') {
-          document.getElementById('mp-opponent-progress').style.width = data.progress + '%';
-          document.getElementById('mp-opponent-wpm').innerText = data.wpm + ' WPM';
+          document.getElementById('opp-mp-progress').style.width = data.progress + '%';
+          document.getElementById('opp-mp-wpm').innerText = data.wpm + ' WPM';
         }
+        if (data.type === 'win') alert("Lawan Anda telah menyelesaikan balapan!");
       });
     }
 
-    function mpStartBattle() {
-      selectMode('typing-test');
+    function generateMpWords() {
+      const words = [];
+      for(let i=0; i<30; i++) words.push(indonesianWords[Math.floor(Math.random() * indonesianWords.length)]);
+      renderMpWords(words);
+      if(conn && conn.open) conn.send({ type: 'words', words });
+    }
+
+    function renderMpWords(words) {
+      const container = document.getElementById('mp-text-container');
+      container.innerHTML = '';
+      mpSpans = [];
+      mpCharIndex = 0;
+      words.forEach(w => {
+        for(let i=0; i<w.length; i++) {
+          const s = document.createElement('span');
+          s.innerText = w[i];
+          s.className = 'char-default';
+          container.appendChild(s);
+          mpSpans.push(s);
+        }
+        const sp = document.createElement('span');
+        sp.innerText = ' ';
+        sp.className = 'char-default';
+        container.appendChild(sp);
+        mpSpans.push(sp);
+      });
+      if(mpSpans.length > 0) mpSpans[0].classList.add('char-current');
+    }
+
+    function startBattle() {
+      if(isHost && conn && conn.open) {
+        conn.send({ type: 'start' });
+        startMpLocal();
+      }
+    }
+
+    function startMpLocal() {
+      document.getElementById('mp-overlay').style.display = 'none';
+      const input = document.getElementById('mp-hidden-input');
+      input.disabled = false;
+      input.focus();
+      mpStartTime = new Date();
+    }
+
+    function handleMpKeyDown(e) {
+      if(e.key === 'Backspace') {
+        if(mpCharIndex > 0) {
+          mpCharIndex--;
+          mpSpans[mpCharIndex].className = 'char-default';
+          mpSpans.forEach(s => s.classList.remove('char-current'));
+          mpSpans[mpCharIndex].classList.add('char-current');
+        }
+        e.preventDefault();
+      }
+    }
+
+    function handleMpTyping(e) {
+      const val = document.getElementById('mp-hidden-input').value;
+      if(!val) return;
+      const charTyped = val.slice(-1);
+      document.getElementById('mp-hidden-input').value = '';
+
+      if(mpCharIndex >= mpSpans.length) return;
+      const target = mpSpans[mpCharIndex].innerText;
+      mpSpans[mpCharIndex].classList.remove('char-default', 'char-current');
+
+      if(charTyped === target) {
+        mpSpans[mpCharIndex].classList.add('char-correct');
+        mpCorrect++;
+      } else {
+        mpSpans[mpCharIndex].classList.add('char-incorrect');
+      }
+      mpCharIndex++;
+
+      if(mpCharIndex < mpSpans.length) {
+        mpSpans[mpCharIndex].classList.add('char-current');
+        mpSpans[mpCharIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        alert("Selesai!");
+        if(conn && conn.open) conn.send({ type: 'win' });
+      }
+
+      const progress = Math.round((mpCharIndex / mpSpans.length) * 100);
+      document.getElementById('my-mp-progress').style.width = progress + '%';
+      const elapsed = (new Date() - mpStartTime) / 1000 / 60;
+      const wpm = elapsed > 0 ? Math.round((mpCorrect/5)/elapsed) : 0;
+      document.getElementById('my-mp-wpm').innerText = wpm + ' WPM';
+
+      if(conn && conn.open) conn.send({ type: 'progress', progress, wpm });
     }
 
     function copyShareLink() {
-      const linkInput = document.getElementById('mp-share-link');
-      linkInput.select();
-      document.execCommand('copy');
-      alert("Link undangan berhasil disalin ke clipboard!");
+      const input = document.getElementById('share-link-input');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      alert("Link room berhasil disalin!");
     }
   </script>
-
 </body>
 </html>
