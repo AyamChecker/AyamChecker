@@ -1,30 +1,22 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" dir="ltr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tribun Typing - Fast Competition</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Indonesian Typing Test (Bahasa Indonesia) - Check Your Typing Speed | Tribun Typing</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <style>
-    body {
-      background-color: #121212;
-      color: #e4e4e7;
-    }
-    .dark-card {
-      background-color: #1e1e20;
-      border: 1px solid #27272a;
-    }
-    .word-box {
-      display: inline-block;
-      margin-right: 0.65rem;
-      margin-bottom: 0.5rem;
-    }
-    .char-default { color: #f4f4f5; }
-    .char-correct { color: #4ade80; text-shadow: 0 0 5px rgba(74,222,128,0.4); }
-    .char-incorrect { color: #f87171; background: rgba(248, 113, 113, 0.25); border-radius: 2px; }
-    .char-current { border-left: 2px solid #818cf8; animation: blink 1s infinite; }
+    body { background-color: #121212; color: #e4e4e7; font-family: ui-sans-serif, system-ui, sans-serif; }
+    .dark-card { background-color: #1e1e20; border: 1px solid #27272a; }
+    
+    /* Spasi & Kotak Kata Rapi */
+    .word-box { display: inline-block; margin-right: 0.65rem; margin-bottom: 0.5rem; }
+    .char-default { color: #71717a; }
+    .char-correct { color: #f4f4f5; text-shadow: 0 0 5px rgba(255,255,255,0.3); }
+    .char-incorrect { color: #ef4444; background: rgba(239, 68, 68, 0.2); border-radius: 2px; }
+    .char-current { border-left: 2px solid #ffffff; animation: blink 1s infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -32,52 +24,55 @@
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
   </style>
 </head>
-<body class="min-h-screen font-sans flex flex-col justify-between p-4 sm:p-6">
+<body class="min-h-screen flex flex-col justify-between p-4 sm:p-6">
 
-  <!-- TOP NAVBAR -->
+  <!-- HEADER NAVBAR -->
   <header class="max-w-7xl w-full mx-auto flex items-center justify-between pb-4 border-b border-zinc-800">
-    <div class="flex items-center space-x-3 cursor-pointer" onclick="resetToLobby()">
-      <div class="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-white font-mono text-xs font-bold">
-        IO
-      </div>
-      <h1 class="text-sm font-extrabold tracking-wider text-white uppercase">FASTTYPING</h1>
+    <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
+      <div class="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-white font-mono text-xs font-bold">IO</div>
+      <h1 class="text-sm font-extrabold tracking-wider text-white uppercase">TRIBUN FASTFINGERS</h1>
     </div>
     
     <div class="flex items-center gap-4 text-xs">
-      <button onclick="resetToLobby()" class="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 font-bold rounded-lg border border-emerald-500/30">Test</button>
-      <button class="text-zinc-400 hover:text-white transition">Competition</button>
+      <button onclick="switchMode('test')" id="btn-mode-test" class="px-3 py-1.5 bg-zinc-800 text-white font-bold rounded-lg border border-zinc-700">Test</button>
+      <button onclick="switchMode('competition')" id="btn-mode-comp" class="text-zinc-400 hover:text-white transition">Competition</button>
     </div>
   </header>
 
 
-  <!-- MAIN CONTENT CONTAINER -->
+  <!-- MAIN CONTAINER -->
   <main class="max-w-7xl w-full mx-auto my-8 flex-1">
 
-    <!-- LOBBY INITIAL (BILA BELUM ADA ROOM/LINK) -->
-    <div id="lobby-view" class="max-w-md mx-auto dark-card p-6 rounded-2xl space-y-4 text-center">
-      <h2 class="text-base font-bold text-white">Buat Kompetisi Baru</h2>
-      <p class="text-xs text-zinc-400">Klik tombol di bawah untuk membuat room kompetisi dan mendapatkan link undangan seperti FastFingers.</p>
-      <button onclick="createCompetition()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition shadow-lg">
-        Buat Kompetisi & Dapatkan Link
-      </button>
+    <!-- 1. VIEW MENU UTAMA / LOBBY -->
+    <div id="view-lobby" class="max-w-md mx-auto dark-card p-6 rounded-2xl space-y-4 text-center">
+      <h2 class="text-base font-bold text-white">Mulai Tes atau Kompetisi</h2>
+      <p class="text-xs text-zinc-400">Pilih mode tes mandiri atau buat room kompetisi untuk mengundang teman Anda.</p>
+      <div class="space-y-2">
+        <button onclick="startSoloTest()" class="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs rounded-xl transition border border-zinc-700">
+          Mulai Typing Test (Solo)
+        </button>
+        <button onclick="createCompetition()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition shadow-lg">
+          Buat Kompetisi & Share Link
+        </button>
+      </div>
     </div>
 
 
-    <!-- ARENA KOMPETISI 2 KOLOM (PERSIS SEPERTI GAMBAR) -->
-    <div id="competition-view" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+    <!-- 2. VIEW ARENA UTAMA (TATA LETAK 2 KOLOM PERSIS SEPERTI GAMBAR) -->
+    <div id="view-arena" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
       
       <!-- KOLOM KIRI: AREA MENGETIK (2/3 LEBAR) -->
       <div class="lg:col-span-2 space-y-4">
         
-        <!-- Header Info Kompetisi -->
-        <div class="text-xs text-zinc-400 flex items-center gap-4">
-          <span id="competitors-count"><i class="fa-solid fa-users mr-1"></i> 1 Kompetitor</span>
-          <span class="px-2 py-0.5 bg-blue-950 text-blue-400 border border-blue-800 rounded text-[11px] font-semibold">
+        <!-- Info Kompetitor & Bahasa -->
+        <div class="text-xs text-zinc-400 flex items-center justify-between">
+          <span id="competitors-info"><i class="fa-solid fa-users mr-1"></i> 0 tests taken</span>
+          <span class="px-2 py-0.5 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded text-[11px] font-semibold">
             <i class="fa-solid fa-globe mr-1"></i> Language: Indonesian
           </span>
         </div>
 
-        <!-- Timer Bar & Controls -->
+        <!-- Timer Bar & WPM -->
         <div class="flex items-center justify-between text-xs text-zinc-400 font-mono py-2 border-t border-b border-zinc-800">
           <div class="flex items-center gap-2 text-zinc-300">
             <i class="fa-regular fa-clock"></i>
@@ -85,27 +80,24 @@
           </div>
           <div class="flex items-center gap-4">
             <span id="timer-60s" class="text-white font-bold">01:00</span>
-            <button onclick="resetCurrentTest()" class="hover:text-white transition"><i class="fa-solid fa-rotate-right"></i></button>
+            <button onclick="resetCurrentTest()" class="hover:text-white transition" title="Ulangi"><i class="fa-solid fa-rotate-right"></i></button>
           </div>
         </div>
 
         <!-- Text Box Area -->
         <div class="dark-card p-6 rounded-2xl relative min-h-[160px] shadow-xl">
-          <div id="text-container" class="font-serif text-2xl leading-relaxed select-none h-[120px] overflow-hidden flex flex-wrap content-start custom-scrollbar">
-            <!-- Teks akan dimasukkan secara dinamis oleh JS -->
-          </div>
-
+          <div id="text-container" class="font-serif text-xl sm:text-2xl leading-relaxed select-none h-[120px] overflow-hidden flex flex-wrap content-start custom-scrollbar"></div>
           <input type="text" id="hidden-input" class="absolute opacity-0 pointer-events-none" autofocus oninput="handleTyping(event)" onkeydown="handleKeyDown(event)">
 
-          <!-- Overlay Klik/Mulai -->
+          <!-- Overlay Klik / Mulai -->
           <div id="start-overlay" onclick="focusInput()" class="absolute inset-0 bg-[#121212]/90 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center cursor-pointer transition p-4 text-center z-10">
             <i class="fa-solid fa-keyboard text-2xl text-zinc-400 mb-2 animate-bounce"></i>
             <span id="overlay-msg" class="text-xs font-bold text-zinc-300">Klik di sini atau mulai mengetik untuk memulai tes</span>
           </div>
         </div>
 
-        <!-- Realtime Progress Bar Lawan -->
-        <div id="opp-progress-box" class="hidden dark-card p-4 rounded-xl space-y-2">
+        <!-- Realtime Progress Lawan & Pemenang -->
+        <div id="progress-box" class="hidden dark-card p-4 rounded-xl space-y-2">
           <div class="flex justify-between items-center text-xs font-bold">
             <span class="text-zinc-400">Progress Lawan:</span>
             <span id="opp-wpm" class="text-emerald-400 font-mono">0 WPM</span>
@@ -113,13 +105,14 @@
           <div class="w-full bg-zinc-900 rounded-full h-2 overflow-hidden border border-zinc-800">
             <div id="opp-bar" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
           </div>
+          <div id="winner-banner" class="hidden p-3 bg-emerald-950/80 border border-emerald-500 text-emerald-300 text-center font-bold text-xs rounded-xl animate-pulse"></div>
         </div>
 
       </div>
 
 
       <!-- KOLOM KANAN: KOTAK SHARE THIS COMPETITION (1/3 LEBAR) -->
-      <div class="space-y-4">
+      <div id="share-box-container" class="hidden space-y-4">
         <div class="dark-card p-5 rounded-2xl space-y-4">
           <h3 class="text-sm font-bold text-white border-b border-zinc-800 pb-3">
             Share this competition
@@ -145,7 +138,7 @@
 
   <!-- FOOTER -->
   <footer class="max-w-7xl w-full mx-auto text-center text-xs text-zinc-600 pt-6 border-t border-zinc-900">
-    Tribun FastTyping &bull; Competition Edition
+    Tribun FastFingers &bull; Indonesian Edition
   </footer>
 
 
@@ -154,12 +147,14 @@
       "baru", "jadi", "pada", "makanan", "anak", "nanti", "apa", "lagi", "sehingga",
       "pusat", "ingin", "sekali", "memang", "mata", "khusus", "sedang", "pulang", "makan",
       "minum", "tidur", "jalan", "rumah", "mobil", "motor", "buku", "meja", "kursi",
-      "pagi", "siang", "malam", "sore", "air", "api", "batu", "kayu", "daun", "bunga"
+      "pagi", "siang", "malam", "sore", "air", "api", "batu", "kayu", "daun", "bunga",
+      "orang", "bapak", "ibu", "teman", "kerja", "sekolah", "pasar", "toko", "uang"
     ];
 
     let peer = null;
     let conn = null;
     let isHost = false;
+    let isMultiplayer = false;
     let charIndex = 0;
     let correctChars = 0;
     let totalTyped = 0;
@@ -170,7 +165,7 @@
     let isFinished = false;
 
     window.onload = () => {
-      // Inisialisasi PeerJS dengan STUN Google agar koneksi lancar
+      // Menggunakan PeerJS dengan konfigurasi STUN publik agar koneksi stabil
       peer = new Peer({
         config: {
           iceServers: [
@@ -194,25 +189,39 @@
       });
     };
 
+    function startSoloTest() {
+      isMultiplayer = false;
+      document.getElementById('view-lobby').classList.add('hidden');
+      document.getElementById('view-arena').classList.remove('hidden');
+      document.getElementById('share-box-container').classList.add('hidden');
+      generateRandomWords(35);
+    }
+
     function createCompetition() {
+      isMultiplayer = true;
       isHost = true;
       const shareUrl = window.location.origin + window.location.pathname + '?room=' + peer.id;
       document.getElementById('share-link-input').value = shareUrl;
 
-      document.getElementById('lobby-view').classList.add('hidden');
-      document.getElementById('competition-view').classList.remove('hidden');
+      document.getElementById('view-lobby').classList.add('hidden');
+      document.getElementById('view-arena').classList.remove('hidden');
+      document.getElementById('share-box-container').classList.remove('hidden');
+      document.getElementById('progress-box').classList.remove('hidden');
 
-      generateRandomWords(40);
+      generateRandomWords(35);
     }
 
     function joinCompetitionAuto(roomCode) {
+      isMultiplayer = true;
       isHost = false;
       conn = peer.connect(roomCode, { reliable: true });
 
       document.getElementById('share-link-input').value = window.location.href;
-      document.getElementById('lobby-view').classList.add('hidden');
-      document.getElementById('competition-view').classList.remove('hidden');
-      document.getElementById('overlay-msg').innerText = "MENGHUBUNGKAN KE KOMPETISI...";
+      document.getElementById('view-lobby').classList.add('hidden');
+      document.getElementById('view-arena').classList.remove('hidden');
+      document.getElementById('share-box-container').classList.remove('hidden');
+      document.getElementById('progress-box').classList.remove('hidden');
+      document.getElementById('overlay-msg').innerText = "Menghubungkan ke Room Kompetisi...";
 
       setupConnection();
     }
@@ -221,12 +230,11 @@
       if (!conn) return;
 
       conn.on('open', () => {
-        document.getElementById('competitors-count').innerHTML = `<i class="fa-solid fa-users mr-1"></i> 2 Kompetitor`;
-        document.getElementById('opp-progress-box').classList.remove('hidden');
+        document.getElementById('competitors-info').innerHTML = `<i class="fa-solid fa-users mr-1"></i> 2 competitors in room`;
         document.getElementById('overlay-msg').innerText = "Klik di sini atau mulai mengetik untuk memulai tes";
 
         if (isHost) {
-          generateRandomWords(40);
+          generateRandomWords(35);
         }
       });
 
@@ -236,6 +244,8 @@
         } else if (data.type === 'progress') {
           document.getElementById('opp-bar').style.width = data.progress + '%';
           document.getElementById('opp-wpm').innerText = data.wpm + ' WPM';
+        } else if (data.type === 'finished') {
+          showWinner("Lawan telah menyelesaikan pengetikan terlebih dahulu! Lawan Menang.");
         }
       });
     }
@@ -288,6 +298,7 @@
       if (isFinished) return;
       document.getElementById('hidden-input').focus();
       document.getElementById('start-overlay').style.display = 'none';
+      startTimer();
     }
 
     function startTimer() {
@@ -296,7 +307,7 @@
         timer = setInterval(() => {
           if (timeLeft > 0) {
             timeLeft--;
-            const secs = timeLeft < 10 ? '0' + timeLeft : timeLeft;
+            let secs = timeLeft < 10 ? '0' + timeLeft : timeLeft;
             document.getElementById('timer-60s').innerText = `00:${secs}`;
           } else {
             endTest();
@@ -312,7 +323,6 @@
       if (e.key === 'Backspace') {
         if (charIndex > 0) {
           charIndex--;
-          totalTyped--;
           allSpans[charIndex].className = 'char-default';
           allSpans.forEach(s => s.classList.remove('char-current'));
           allSpans[charIndex].classList.add('char-current');
@@ -331,9 +341,7 @@
 
       if (charIndex >= allSpans.length) return;
 
-      totalTyped++;
       const targetChar = allSpans[charIndex].innerText;
-
       allSpans[charIndex].classList.remove('char-default', 'char-current');
 
       if (currentCharTyped === targetChar) {
@@ -349,30 +357,46 @@
         allSpans[charIndex].classList.add('char-current');
         allSpans[charIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       } else {
-        endTest();
+        // MENANG KARENA SELESAI PERTAMA
+        finishAsWinner();
       }
 
-      sendProgressToOpponent();
+      sendProgress();
     }
 
-    function sendProgressToOpponent() {
+    function sendProgress() {
       const progress = Math.round((charIndex / allSpans.length) * 100);
-      const elapsedMinutes = (60 - timeLeft) / 60;
-      const wpm = elapsedMinutes > 0 ? Math.round((correctChars / 5) / elapsedMinutes) : 0;
+      const elapsedMinutes = (60 - timeLeft) / 60 || 0.001;
+      const wpm = Math.round((correctChars / 5) / elapsedMinutes);
 
-      if (conn && conn.open) {
+      if (isMultiplayer && conn && conn.open) {
         conn.send({ type: 'progress', progress, wpm });
       }
+    }
+
+    function finishAsWinner() {
+      isFinished = true;
+      clearInterval(timer);
+      showWinnerBanner("SELAMAT! Anda Menang dan Menyelesaikan Tes Tercepat!");
+      if (isMultiplayer && conn && conn.open) {
+        conn.send({ type: 'finished' });
+      }
+    }
+
+    function showWinnerBanner(message) {
+      isFinished = true;
+      clearInterval(timer);
+      const banner = document.getElementById('winner-banner');
+      banner.innerText = message;
+      banner.classList.remove('hidden');
+      document.getElementById('start-overlay').style.display = 'flex';
+      document.getElementById('overlay-msg').innerText = message;
     }
 
     function endTest() {
       isFinished = true;
       clearInterval(timer);
-      const elapsedMinutes = (60 - timeLeft) / 60 || 1;
-      const wpm = Math.round((correctChars / 5) / elapsedMinutes);
-
-      document.getElementById('start-overlay').style.display = 'flex';
-      document.getElementById('overlay-msg').innerText = `Tes Selesai! Skor Anda: ${wpm} WPM.`;
+      showWinnerBanner("Waktu Habis! Tes Berakhir.");
     }
 
     function resetCurrentTest() {
@@ -384,13 +408,18 @@
       correctChars = 0;
       totalTyped = 0;
       document.getElementById('timer-60s').innerText = "01:00";
+      document.getElementById('winner-banner').classList.add('hidden');
       document.getElementById('start-overlay').style.display = 'flex';
       document.getElementById('overlay-msg').innerText = "Klik di sini atau mulai mengetik untuk memulai tes";
-      generateRandomWords(40);
+      generateRandomWords(35);
     }
 
-    function resetToLobby() {
-      window.location.href = window.location.pathname;
+    function switchMode(mode) {
+      if (mode === 'test') {
+        location.href = window.location.pathname;
+      } else {
+        createCompetition();
+      }
     }
 
     function copyShareLink() {
