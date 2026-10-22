@@ -1,436 +1,277 @@
 <!DOCTYPE html>
-<html lang="id" dir="ltr">
+<html lang="id">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Indonesian Typing Test & Multi-Language Competition | Tribun FastFingers</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alarm & Jadwal Pasaran</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-  <style>
-    body { background-color: #121212; color: #e4e4e7; font-family: ui-sans-serif, system-ui, sans-serif; }
-    .dark-card { background-color: #1e1e20; border: 1px solid #27272a; }
-    
-    /* Spasi & Kotak Kata Rapi */
-    .word-box { display: inline-block; margin-right: 0.65rem; margin-bottom: 0.5rem; }
-    .char-default { color: #71717a; }
-    .char-correct { color: #f4f4f5; text-shadow: 0 0 5px rgba(255,255,255,0.3); }
-    .char-incorrect { color: #ef4444; background: rgba(239, 68, 68, 0.2); border-radius: 2px; }
-    .char-current { border-left: 2px solid #ffffff; animation: blink 1s infinite; }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: #18181b; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
-  </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between p-4 sm:p-6">
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col justify-between p-4 sm:p-6 font-sans">
 
-  <!-- HEADER NAVBAR -->
-  <header class="max-w-7xl w-full mx-auto flex items-center justify-between pb-4 border-b border-zinc-800">
-    <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
-      <div class="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-white font-mono text-xs font-bold">IO</div>
-      <h1 class="text-sm font-extrabold tracking-wider text-white uppercase">TRIBUN FASTFINGERS</h1>
-    </div>
+  <!-- HEADER & JAM REALTIME -->
+  <header class="max-w-4xl w-full mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-6 mb-6 text-center shadow-xl">
+    <h1 class="text-xs sm:text-sm font-bold uppercase tracking-widest text-emerald-400 mb-1">
+      <i class="fa-solid fa-clock mr-1"></i> Waktu Realtime (WIB)
+    </h1>
+    <div id="clock" class="text-4xl sm:text-6xl font-mono font-extrabold text-white tracking-wider my-2">00:00:00</div>
     
-    <div class="flex items-center gap-3 text-xs">
-      <!-- Pilihan Bahasa -->
-      <select id="language-select" onchange="changeLanguage()" class="bg-zinc-800 border border-zinc-700 text-white rounded-lg px-2 py-1.5 focus:outline-none">
-        <option value="id">Bahasa Indonesia</option>
-        <option value="en">English</option>
-        <option value="es">Español</option>
-      </select>
-      <button onclick="startSoloTest()" class="px-3 py-1.5 bg-zinc-800 text-white font-bold rounded-lg border border-zinc-700">Test Solo</button>
-      <button onclick="createCompetition()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition">Competition</button>
+    <div class="flex flex-wrap items-center justify-center gap-3 mt-4">
+      <button id="audio-btn" onclick="toggleAudio()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition shadow-lg flex items-center gap-2">
+        <i class="fa-solid fa-volume-high"></i> Aktifkan Suara Alarm
+      </button>
+      <span id="audio-status" class="text-xs text-zinc-400 font-medium">Status Suara: <b class="text-red-400">Nonaktif</b></span>
     </div>
   </header>
 
-
-  <!-- MAIN CONTAINER (2 KOLOM PERSIS FASTFINGERS) -->
-  <main class="max-w-7xl w-full mx-auto my-8 flex-1">
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+  <!-- MAIN CONTAINER: TABEL JADWAL -->
+  <main class="max-w-4xl w-full mx-auto flex-1 mb-6">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-xl space-y-4">
       
-      <!-- KOLOM KIRI: AREA MENGETIK (2/3 LEBAR) -->
-      <div class="lg:col-span-2 space-y-4">
-        
-        <!-- Info Kompetitor & Bahasa -->
-        <div class="text-xs text-zinc-400 flex items-center justify-between">
-          <span id="competitors-info"><i class="fa-solid fa-users mr-1"></i> 0 competitors in room</span>
-          <span class="px-2.5 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-md text-[11px] font-semibold flex items-center gap-1.5">
-            <i class="fa-solid fa-globe"></i> Language: <span id="current-lang-text" class="text-white font-bold">Indonesian</span>
-          </span>
-        </div>
-
-        <!-- Timer Bar & Live WPM -->
-        <div class="flex items-center justify-between text-xs text-zinc-400 font-mono py-2 border-t border-b border-zinc-800">
-          <div class="flex items-center gap-2 text-zinc-300">
-            <i class="fa-regular fa-clock"></i>
-            <span id="timer-24h" class="font-bold text-white">23:59:45</span>
-          </div>
-          <div class="flex items-center gap-4">
-            <span id="timer-60s" class="text-white font-bold text-base">01:00</span>
-            <button onclick="resetCurrentTest()" class="hover:text-white transition p-1" title="Ulangi"><i class="fa-solid fa-rotate-right"></i></button>
-          </div>
-        </div>
-
-        <!-- Text Box Area (Teks Tidak Terbatas / Endless) -->
-        <div class="dark-card p-6 rounded-2xl relative min-h-[160px] shadow-xl">
-          <div id="text-container" class="font-serif text-xl sm:text-2xl leading-relaxed select-none h-[120px] overflow-hidden flex flex-wrap content-start custom-scrollbar"></div>
-          <input type="text" id="hidden-input" class="absolute opacity-0 pointer-events-none" autofocus oninput="handleTyping(event)" onkeydown="handleKeyDown(event)">
-
-          <!-- Overlay Klik / Mulai -->
-          <div id="start-overlay" onclick="focusInput()" class="absolute inset-0 bg-[#121212]/90 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center cursor-pointer transition p-4 text-center z-10">
-            <i class="fa-solid fa-keyboard text-2xl text-zinc-400 mb-2 animate-bounce"></i>
-            <span id="overlay-msg" class="text-xs font-bold text-zinc-300">Klik di sini atau mulai mengetik untuk memulai tes</span>
-          </div>
-        </div>
-
-        <!-- Realtime Progress Lawan & Pemenang -->
-        <div id="progress-box" class="dark-card p-4 rounded-xl space-y-2">
-          <div class="flex justify-between items-center text-xs font-bold">
-            <span class="text-zinc-400">Progress Lawan:</span>
-            <span id="opp-wpm" class="text-emerald-400 font-mono">0 WPM</span>
-          </div>
-          <div class="w-full bg-zinc-900 rounded-full h-2 overflow-hidden border border-zinc-800">
-            <div id="opp-bar" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
-          </div>
-          <div id="winner-banner" class="hidden p-3 bg-emerald-950/80 border border-emerald-500 text-emerald-300 text-center font-bold text-xs rounded-xl animate-pulse"></div>
-        </div>
-
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b border-zinc-800 pb-4">
+        <h2 class="text-base font-bold text-white uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-list-check text-emerald-400"></i> Daftar Jadwal Pasaran
+        </h2>
+        <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Cari nama pasaran..." class="w-full sm:w-64 bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono">
       </div>
 
-
-      <!-- KOLOM KANAN: KOTAK SHARE THIS COMPETITION (1/3 LEBAR) -->
-      <div class="space-y-4">
-        <div class="dark-card p-5 rounded-2xl space-y-4">
-          <h3 class="text-sm font-bold text-white border-b border-zinc-800 pb-3">
-            Share this competition
-          </h3>
-
-          <p class="text-xs text-zinc-400">
-            Invite your friends by sharing this link:
-          </p>
-
-          <div class="flex items-center gap-1 bg-zinc-900 border border-zinc-700/80 rounded-xl p-1">
-            <input type="text" id="share-link-input" readonly class="w-full bg-transparent px-3 py-1.5 text-xs text-zinc-300 font-mono focus:outline-none" placeholder="Klik 'Competition' untuk salin link">
-            <button onclick="copyShareLink()" class="p-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white rounded-lg transition border border-zinc-700">
-              <i class="fa-regular fa-copy text-sm"></i>
-            </button>
-          </div>
-        </div>
+      <!-- TABLE CONTAINER -->
+      <div class="overflow-x-auto max-h-[500px] overflow-y-auto pr-1">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="sticky top-0 bg-zinc-900 border-b border-zinc-800 text-zinc-400 uppercase font-bold text-[11px]">
+            <tr>
+              <th class="py-3 px-3">Pasaran</th>
+              <th class="py-3 px-3 text-center">Tutup</th>
+              <th class="py-3 px-3 text-center">Result</th>
+              <th class="py-3 px-3 text-right">Status</th>
+            </tr>
+          </thead>
+          <tbody id="pasaran-table-body" class="divide-y divide-zinc-800/50 font-mono">
+            <!-- Data dimasukkan via JS -->
+          </tbody>
+        </table>
       </div>
 
     </div>
-
   </main>
 
+  <!-- POPUP NOTIFIKASI ALARM -->
+  <div id="alarm-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-zinc-900 border border-emerald-500/50 p-6 rounded-2xl max-w-sm w-full text-center space-y-4 shadow-2xl animate-bounce">
+      <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-xl border border-emerald-500/30">
+        <i class="fa-solid fa-bell"></i>
+      </div>
+      <h3 id="modal-title" class="text-lg font-extrabold text-white uppercase tracking-wider">ALARM PASARAN</h3>
+      <p id="modal-msg" class="text-xs text-zinc-300 leading-relaxed font-mono"></p>
+      <button onclick="closeAlarmModal()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition">
+        MATIKAN ALARM
+      </button>
+    </div>
+  </div>
 
-  <!-- FOOTER -->
-  <footer class="max-w-7xl w-full mx-auto text-center text-xs text-zinc-600 pt-6 border-t border-zinc-900">
-    Tribun FastFingers &bull; Indonesian & Multi-Language Edition
+  <footer class="max-w-4xl w-full mx-auto text-center text-xs text-zinc-600">
+    Aplikasi Alarm Pasaran &bull; Realtime WIB Indicator
   </footer>
 
-
   <script>
-    // Bank Kata Luas (200+ Kosakata Terpopuler)
-    const wordDictionaries = {
-      id: [
-        "yang", "untuk", "pada", "adalah", "dengan", "dengan", "dari", "dalam", "tidak", "akan", 
-        "juga", "atau", "oleh", "bisa", "sudah", "lebih", "dapat", "tahun", "banyak", "antara", 
-        "seperti", "hanya", "mereka", "harus", "saat", "sangat", "karena", "karena", "seperti", 
-        "orang", "maka", "satu", "dunia", "anak", "kita", "hari", "secara", "baru", "satu", 
-        "pemerintah", "satu", "sebagai", "dua", "ia", "dapat", "bagi", "sampai", "bahwa", "satu", 
-        "tempat", "satu", "telah", "bila", "besar", "kembali", "luar", "setelah", "sendiri", 
-        "waktu", "dapat", "namun", "tersebut", "masih", "lain", "baik", "terus", "jadi", "hidup", 
-        "muda", "lama", "tapi", "selalu", "jalan", "paling", "bukan", "mana", "tangan", "tamu", 
-        "kata", "melihat", "makanan", "rumah", "mobil", "motor", "buku", "meja", "kursi", "pagi", 
-        "siang", "malam", "sore", "air", "api", "batu", "kayu", "daun", "bunga", "bapak", "ibu", 
-        "teman", "kerja", "sekolah", "pasar", "toko", "uang", "baju", "celana", "sepatu", "topi", 
-        "lampu", "pintu", "jendela", "kertas", "pulpen", "satu", "dua", "tiga", "empat", "lima", 
-        "enam", "tujuh", "delapan", "sembilan", "sepuluh", "pusat", "ingin", "sekali", "memang", 
-        "mata", "khusus", "sedang", "pulang", "tidur", "makan", "minum", "teknologi", "komputer", 
-        "jaringan", "sistem", "informasi", "dunia", "negara", "rakyat", "bangsa", "keluarga", 
-        "cerita", "pikir", "suara", "kasih", "cinta", "semangat", "sukses", "impian", "rencana"
-      ],
-      en: [
-        "the", "be", "to", "of", "and", "a", "in", "that", "have", "I", "it", "for", "not", 
-        "on", "with", "he", "as", "you", "do", "at", "this", "but", "his", "by", "from", 
-        "they", "we", "say", "her", "she", "or", "an", "will", "my", "one", "all", "would", 
-        "there", "their", "what", "so", "up", "out", "if", "about", "who", "get", "which", 
-        "go", "me", "when", "make", "can", "like", "time", "no", "just", "him", "know", 
-        "take", "people", "into", "year", "your", "good", "some", "could", "them", "see", 
-        "other", "than", "then", "now", "look", "only", "come", "its", "over", "think", 
-        "also", "back", "after", "use", "two", "how", "our", "work", "first", "well", "way"
-      ],
-      es: [
-        "que", "de", "no", "a", "la", "el", "es", "y", "en", "lo", "un", "por", "qué",
-        "me", "una", "te", "los", "se", "con", "para", "mi", "está", "si", "bien", "esos",
-        "pero", "más", "hacer", "todo", "como", "nada", "casa", "vida", "mundo", "tiempo"
-      ]
-    };
+    const jadwalData = [
+      { nama: "NEWYORKEVE", tutup: "09:10", result: "09:45" },
+      { nama: "KENTUCKYEVE", tutup: "09:45", result: "10:05" },
+      { nama: "CAROLINAEVE", tutup: "10:10", result: "10:22" },
+      { nama: "TASMANIA10", tutup: "10:30", result: "11:00" },
+      { nama: "CAMBODIA", tutup: "11:20", result: "11:50" },
+      { nama: "OREGON12", tutup: "11:45", result: "12:00" },
+      { nama: "BULLSEYE", tutup: "11:45", result: "12:30" },
+      { nama: "FUJIAN12", tutup: "12:00", result: "12:30" },
+      { nama: "TASMANIA13", tutup: "12:30", result: "13:00" },
+      { nama: "TOTOMACAU13", tutup: "13:00", result: "13:10" },
+      { nama: "SYDNEY", tutup: "13:49", result: "13:50" },
+      { nama: "LIBANON", tutup: "14:30", result: "15:00" },
+      { nama: "TOTOMACAU5D15", tutup: "15:15", result: "15:25" },
+      { nama: "CHINA", tutup: "15:00", result: "15:30" },
+      { nama: "FUJIAN15", tutup: "15:15", result: "15:45" },
+      { nama: "TOTOMACAU16", tutup: "16:00", result: "16:10" },
+      { nama: "TASMANIA16", tutup: "16:00", result: "16:30" },
+      { nama: "KINGKONG17", tutup: "17:00", result: "17:05" },
+      { nama: "JAPAN", tutup: "16:50", result: "17:20" },
+      { nama: "SINGAPORE", tutup: "17:25", result: "17:45" },
+      { nama: "KAMBOJA", tutup: "18:15", result: "18:30" },
+      { nama: "TOTOMACAU19", tutup: "19:00", result: "19:10" },
+      { nama: "FUJIAN20", tutup: "19:30", result: "20:00" },
+      { nama: "PCSO", tutup: "19:50", result: "20:10" },
+      { nama: "TAIWAN", tutup: "20:15", result: "20:45" },
+      { nama: "YORDANIA4D", tutup: "20:30", result: "21:00" },
+      { nama: "TOTOMACAU5D21", tutup: "21:25", result: "21:25" },
+      { nama: "CHICAGODAY", tutup: "21:00", result: "21:30" },
+      { nama: "TOTOMACAU22", tutup: "22:00", result: "22:10" },
+      { nama: "TOTOMACAU23", tutup: "23:00", result: "23:10" },
+      { nama: "HONGKONG", tutup: "22:59", result: "23:00" },
+      { nama: "JAKARTA", tutup: "22:30", result: "23:30" },
+      { nama: "KINGKONG23", tutup: "23:30", result: "23:35" },
+      { nama: "FUJIAN23", tutup: "23:15", result: "23:45" },
+      { nama: "TOTOMACAU00", tutup: "00:01", result: "00:10" },
+      { nama: "KENTUCKYMID", tutup: "00:05", result: "00:30" },
+      { nama: "FLORIDAMID", tutup: "00:15", result: "00:40" },
+      { nama: "TURKI", tutup: "00:45", result: "01:20" },
+      { nama: "NEWYORKMID", tutup: "01:05", result: "01:45" },
+      { nama: "CAROLINADAY", tutup: "01:45", result: "02:00" },
+      { nama: "MAROKO", tutup: "02:30", result: "03:00" },
+      { nama: "OREGON3", tutup: "02:45", result: "03:00" },
+      { nama: "OREGON6", tutup: "05:45", result: "06:00" },
+      { nama: "TASMANIA06", tutup: "06:30", result: "07:00" },
+      { nama: "CHICAGONIGHT", tutup: "07:30", result: "08:00" },
+      { nama: "FLORIDAEVE", tutup: "08:35", result: "08:55" },
+      { nama: "OREGON9", tutup: "08:45", result: "09:00" }
+    ];
 
-    let currentLang = 'id';
-    let peer = null;
-    let conn = null;
-    let isHost = false;
-    let isMultiplayer = false;
-    let charIndex = 0;
-    let correctChars = 0;
-    let totalTyped = 0;
-    let allSpans = [];
-    let timer = null;
-    let timeLeft = 60;
-    let isStarted = false;
-    let isFinished = false;
+    let audioContext = null;
+    let audioEnabled = false;
+    let triggeredAlarms = {}; // Mencegah alarm bunyi berulang di menit yang sama
+
+    // Render Tabel awal
+    function renderTable() {
+      const tbody = document.getElementById('pasaran-table-body');
+      tbody.innerHTML = '';
+
+      jadwalData.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-zinc-800/40 transition";
+        tr.id = `row-${item.nama}`;
+        tr.innerHTML = `
+          <td class="py-3 px-3 font-bold text-zinc-200">${item.nama}</td>
+          <td class="py-3 px-3 text-center text-amber-400 font-semibold">${item.tutup} WIB</td>
+          <td class="py-3 px-3 text-center text-emerald-400 font-semibold">${item.result} WIB</td>
+          <td class="py-3 px-3 text-right">
+            <span class="status-badge text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-500 border border-zinc-700">MENUNGGU</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Aktifkan Suara Audio (Fitur Autoplay Browser Policy)
+    function toggleAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      audioEnabled = !audioEnabled;
+      
+      const btn = document.getElementById('audio-btn');
+      const status = document.getElementById('audio-status');
+
+      if (audioEnabled) {
+        btn.className = "px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl text-xs transition shadow-lg flex items-center gap-2";
+        btn.innerHTML = `<i class="fa-solid fa-volume-xmark"></i> Matikan Suara Alarm`;
+        status.innerHTML = `Status Suara: <b class="text-emerald-400">Aktif</b>`;
+        playBeep(800, 0.2); // Tes bunyi singkat
+      } else {
+        btn.className = "px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition shadow-lg flex items-center gap-2";
+        btn.innerHTML = `<i class="fa-solid fa-volume-high"></i> Aktifkan Suara Alarm`;
+        status.innerHTML = `Status Suara: <b class="text-red-400">Nonaktif</b>`;
+      }
+    }
+
+    // Fungsi Pembunyian Alarm Sederhana via Web Audio API
+    function playBeep(freq = 1000, duration = 1) {
+      if (!audioEnabled || !audioContext) return;
+      try {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.type = 'square';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.start();
+        osc.stop(audioContext.currentTime + duration);
+      } catch (e) { console.error(e); }
+    }
+
+    // Pemicu Alarm Bunyi Berulang
+    let alarmInterval = null;
+    function startAlarmSound() {
+      if (!audioEnabled) return;
+      alarmInterval = setInterval(() => {
+        playBeep(1200, 0.3);
+      }, 500);
+    }
+
+    function stopAlarmSound() {
+      if (alarmInterval) clearInterval(alarmInterval);
+    }
+
+    // Update Jam Realtime & Cek Alarm
+    function updateClock() {
+      const now = new Date();
+      // Konversi ke zona WIB (Asia/Jakarta)
+      const options = { timeZone: 'Asia/Jakarta', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+      const timeStr = now.toLocaleTimeString('id-ID', options).replace(/\./g, ':');
+      
+      document.getElementById('clock').innerText = timeStr;
+
+      const currentHM = timeStr.substring(0, 5); // Format HH:MM
+
+      jadwalData.forEach(item => {
+        const row = document.getElementById(`row-${item.nama}`);
+        const badge = row.querySelector('.status-badge');
+
+        // Cek Tutup
+        if (item.tutup === currentHM) {
+          badge.className = "status-badge text-[10px] px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/50 font-bold animate-pulse";
+          badge.innerText = "TUTUP!";
+
+          if (!triggeredAlarms[item.nama + '-tutup-' + currentHM]) {
+            triggerAlarm(item.nama, "TUTUP", item.tutup);
+            triggeredAlarms[item.nama + '-tutup-' + currentHM] = true;
+          }
+        } 
+        // Cek Result
+        else if (item.result === currentHM) {
+          badge.className = "status-badge text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/50 font-bold animate-pulse";
+          badge.innerText = "RESULT!";
+
+          if (!triggeredAlarms[item.nama + '-result-' + currentHM]) {
+            triggerAlarm(item.nama, "RESULT", item.result);
+            triggeredAlarms[item.nama + '-result-' + currentHM] = true;
+          }
+        } else {
+          badge.className = "status-badge text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-500 border border-zinc-700";
+          badge.innerText = "MENUNGGU";
+        }
+      });
+    }
+
+    // Pemicu Modal & Getaran HP
+    function triggerAlarm(namaPasaran, jenis, waktu) {
+      startAlarmSound();
+      if (navigator.vibrate) navigator.vibrate([500, 250, 500, 250, 500]); // Getar HP
+
+      document.getElementById('modal-title').innerText = `ALARM ${jenis}!`;
+      document.getElementById('modal-msg').innerText = `Pasaran ${namaPasaran} telah memasuki waktu ${jenis} pada pukul ${waktu} WIB.`;
+      document.getElementById('alarm-modal').style.display = 'flex';
+    }
+
+    function closeAlarmModal() {
+      stopAlarmSound();
+      document.getElementById('alarm-modal').style.display = 'none';
+    }
+
+    // Filter Pencarian Pasaran
+    function filterTable() {
+      const input = document.getElementById('search-input').value.toUpperCase();
+      const rows = document.querySelectorAll('#pasaran-table-body tr');
+
+      rows.forEach(row => {
+        const text = row.cells[0].innerText.toUpperCase();
+        row.style.display = text.includes(input) ? '' : 'none';
+      });
+    }
 
     window.onload = () => {
-      peer = new Peer({
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' }
-          ]
-        }
-      });
-
-      peer.on('open', (id) => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const room = urlParams.get('room');
-        if (room) {
-          joinCompetitionAuto(room);
-        } else {
-          generateEndlessWords(150);
-        }
-      });
-
-      peer.on('connection', (c) => {
-        conn = c;
-        setupConnection();
-      });
+      renderTable();
+      setInterval(updateClock, 1000);
+      updateClock();
     };
-
-    function changeLanguage() {
-      currentLang = document.getElementById('language-select').value;
-      const langNames = { id: 'Indonesian', en: 'English', es: 'Español' };
-      document.getElementById('current-lang-text').innerText = langNames[currentLang];
-      resetCurrentTest();
-    }
-
-    // Fungsi pengacak kata dinamis tanpa batas
-    function generateEndlessWords(count) {
-      const dict = wordDictionaries[currentLang] || wordDictionaries['id'];
-      const selectedWords = [];
-      for (let i = 0; i < count; i++) {
-        // Menggunakan Math.random() murni agar urutan kata selalu berbeda
-        const randomIndex = Math.floor(Math.random() * dict.length);
-        selectedWords.push(dict[randomIndex]);
-      }
-      renderWords(selectedWords);
-
-      if (conn && conn.open && isHost) {
-        conn.send({ type: 'words', words: selectedWords });
-      }
-    }
-
-    function renderWords(words) {
-      const textContainer = document.getElementById('text-container');
-      textContainer.innerHTML = '';
-      allSpans = [];
-      charIndex = 0;
-
-      words.forEach(word => {
-        const wordBox = document.createElement('div');
-        wordBox.className = 'word-box';
-
-        for (let j = 0; j < word.length; j++) {
-          const span = document.createElement('span');
-          span.innerText = word[j];
-          span.className = 'char-default';
-          wordBox.appendChild(span);
-          allSpans.push(span);
-        }
-
-        const spaceSpan = document.createElement('span');
-        spaceSpan.innerText = ' ';
-        spaceSpan.className = 'char-default';
-        wordBox.appendChild(spaceSpan);
-        allSpans.push(spaceSpan);
-
-        textContainer.appendChild(wordBox);
-      });
-
-      if (allSpans.length > 0) {
-        allSpans[0].classList.add('char-current');
-      }
-    }
-
-    function createCompetition() {
-      isMultiplayer = true;
-      isHost = true;
-      const shareUrl = window.location.origin + window.location.pathname + '?room=' + peer.id;
-      document.getElementById('share-link-input').value = shareUrl;
-      generateEndlessWords(150);
-    }
-
-    function joinCompetitionAuto(roomCode) {
-      isMultiplayer = true;
-      isHost = false;
-      conn = peer.connect(roomCode, { reliable: true });
-
-      document.getElementById('share-link-input').value = window.location.href;
-      document.getElementById('overlay-msg').innerText = "Menghubungkan ke Room Kompetisi...";
-      setupConnection();
-    }
-
-    function setupConnection() {
-      if (!conn) return;
-
-      conn.on('open', () => {
-        document.getElementById('competitors-info').innerHTML = `<i class="fa-solid fa-users mr-1"></i> 2 competitors in room`;
-        document.getElementById('overlay-msg').innerText = "Klik di sini atau mulai mengetik untuk memulai tes";
-
-        if (isHost) {
-          generateEndlessWords(150);
-        }
-      });
-
-      conn.on('data', (data) => {
-        if (data.type === 'words') {
-          renderWords(data.words);
-        } else if (data.type === 'progress') {
-          document.getElementById('opp-bar').style.width = data.progress + '%';
-          document.getElementById('opp-wpm').innerText = data.wpm + ' WPM';
-        } else if (data.type === 'finished') {
-          showWinner("Lawan telah menyelesaikan tes terlebih dahulu!");
-        }
-      });
-    }
-
-    function focusInput() {
-      if (isFinished) return;
-      document.getElementById('hidden-input').focus();
-      document.getElementById('start-overlay').style.display = 'none';
-      startTimer();
-    }
-
-    function startTimer() {
-      if (!isStarted) {
-        isStarted = true;
-        timer = setInterval(() => {
-          if (timeLeft > 0) {
-            timeLeft--;
-            let secs = timeLeft < 10 ? '0' + timeLeft : timeLeft;
-            document.getElementById('timer-60s').innerText = `00:${secs}`;
-          } else {
-            endTest();
-          }
-        }, 1000);
-      }
-    }
-
-    function handleKeyDown(e) {
-      if (isFinished) return;
-      startTimer();
-
-      if (e.key === 'Backspace') {
-        if (charIndex > 0) {
-          charIndex--;
-          allSpans[charIndex].className = 'char-default';
-          allSpans.forEach(s => s.classList.remove('char-current'));
-          allSpans[charIndex].classList.add('char-current');
-        }
-        e.preventDefault();
-      }
-    }
-
-    function handleTyping(e) {
-      if (isFinished) return;
-      const typedVal = document.getElementById('hidden-input').value;
-      if (!typedVal) return;
-
-      const currentCharTyped = typedVal.slice(-1);
-      document.getElementById('hidden-input').value = '';
-
-      if (charIndex >= allSpans.length) return;
-
-      const targetChar = allSpans[charIndex].innerText;
-      allSpans[charIndex].classList.remove('char-default', 'char-current');
-
-      if (currentCharTyped === targetChar) {
-        allSpans[charIndex].classList.add('char-correct');
-        correctChars++;
-      } else {
-        allSpans[charIndex].classList.add('char-incorrect');
-      }
-
-      charIndex++;
-
-      if (charIndex < allSpans.length) {
-        allSpans[charIndex].classList.add('char-current');
-        allSpans[charIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-
-      sendProgress();
-    }
-
-    function sendProgress() {
-      const progress = Math.round((charIndex / allSpans.length) * 100);
-      const elapsedMinutes = (60 - timeLeft) / 60 || 0.001;
-      const wpm = Math.round((correctChars / 5) / elapsedMinutes);
-
-      if (isMultiplayer && conn && conn.open) {
-        conn.send({ type: 'progress', progress, wpm });
-      }
-    }
-
-    function showWinner(message) {
-      isFinished = true;
-      clearInterval(timer);
-      const banner = document.getElementById('winner-banner');
-      banner.innerText = message;
-      banner.classList.remove('hidden');
-      document.getElementById('start-overlay').style.display = 'flex';
-      document.getElementById('overlay-msg').innerText = message;
-    }
-
-    function endTest() {
-      isFinished = true;
-      clearInterval(timer);
-      const elapsedMinutes = 1;
-      const finalWpm = Math.round((correctChars / 5) / elapsedMinutes);
-      showWinner(`Waktu Habis! Hasil Anda: ${finalWpm} WPM.`);
-    }
-
-    function resetCurrentTest() {
-      clearInterval(timer);
-      isStarted = false;
-      isFinished = false;
-      timeLeft = 60;
-      charIndex = 0;
-      correctChars = 0;
-      totalTyped = 0;
-      document.getElementById('timer-60s').innerText = "01:00";
-      document.getElementById('winner-banner').classList.add('hidden');
-      document.getElementById('start-overlay').style.display = 'flex';
-      document.getElementById('overlay-msg').innerText = "Klik di sini atau mulai mengetik untuk memulai tes";
-      generateEndlessWords(150);
-    }
-
-    function startSoloTest() {
-      isMultiplayer = false;
-      resetCurrentTest();
-    }
-
-    function copyShareLink() {
-      const linkInput = document.getElementById('share-link-input');
-      if (!linkInput.value) {
-        createCompetition();
-      }
-      linkInput.select();
-      navigator.clipboard.writeText(linkInput.value);
-      alert("Link kompetisi berhasil disalin! Bagikan ke teman Anda.");
-    }
   </script>
 </body>
 </html>
