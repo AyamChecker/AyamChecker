@@ -7,16 +7,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* KONFIGURASI EFEK BORDER NEON BERGERAK MEMUTAR */
+    /* EFEK BORDER NEON BERGERAK MEMUTAR */
     .neon-card-wrapper {
       position: relative;
       border-radius: 1rem;
       overflow: hidden;
-      padding: 3px; /* Ketebalan garis neon */
+      padding: 3px;
       background: #18181b;
     }
 
-    /* Lapisan gradient yang diputar 360 derajat */
     .neon-card-wrapper::before {
       content: '';
       position: absolute;
@@ -34,7 +33,6 @@
       animation: rotateNeon 3s linear infinite;
     }
 
-    /* Lapisan dalam untuk menutupi bagian tengah */
     .neon-card-inner {
       position: relative;
       background-color: #09090b;
@@ -60,7 +58,7 @@
 <body class="min-h-screen flex flex-col justify-between p-4 sm:p-6 font-sans">
 
   <!-- HEADER & JAM REALTIME -->
-  <header class="max-w-5xl w-full mx-auto mb-6 neon-card-wrapper">
+  <header class="max-w-4xl w-full mx-auto mb-6 neon-card-wrapper">
     <div class="neon-card-inner p-4 sm:p-6 text-center">
       <h1 class="text-xs sm:text-sm font-bold uppercase tracking-widest text-yellow-400 mb-1">
         <i class="fa-solid fa-clock mr-1"></i> Waktu Realtime (WIB)
@@ -76,15 +74,15 @@
     </div>
   </header>
 
-  <!-- MAIN CONTAINER: TABEL JADWAL & COUNTDOWN -->
-  <main class="max-w-5xl w-full mx-auto flex-1 mb-6 neon-card-wrapper">
+  <!-- MAIN CONTAINER: TABEL JADWAL -->
+  <main class="max-w-4xl w-full mx-auto flex-1 mb-6 neon-card-wrapper">
     <div class="neon-card-inner p-4 sm:p-6 space-y-4">
       
       <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b border-yellow-500/20 pb-4">
         <h2 class="text-base font-bold text-white uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-hourglass-half text-yellow-400"></i> Jadwal Pasaran & Waktu Tunggu (Countdown)
+          <i class="fa-solid fa-list-check text-yellow-400"></i> Daftar Jadwal Pasaran
         </h2>
-        <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Cari nama pasaran (contoh: TAIWAN)..." class="w-full sm:w-64 bg-zinc-950 border border-yellow-500/30 rounded-xl px-3 py-1.5 text-xs text-yellow-200 focus:outline-none focus:border-yellow-400 font-mono">
+        <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Cari nama pasaran..." class="w-full sm:w-64 bg-zinc-950 border border-yellow-500/30 rounded-xl px-3 py-1.5 text-xs text-yellow-200 focus:outline-none focus:border-yellow-400 font-mono">
       </div>
 
       <!-- TABLE CONTAINER -->
@@ -95,7 +93,6 @@
               <th class="py-3 px-3">Pasaran</th>
               <th class="py-3 px-3 text-center">Tutup</th>
               <th class="py-3 px-3 text-center">Result</th>
-              <th class="py-3 px-3 text-center text-yellow-300">Waktu Tunggu (Countdown)</th>
               <th class="py-3 px-3 text-right">Status</th>
             </tr>
           </thead>
@@ -124,7 +121,7 @@
     </div>
   </div>
 
-  <footer class="max-w-5xl w-full mx-auto text-center text-xs text-yellow-500/60">
+  <footer class="max-w-4xl w-full mx-auto text-center text-xs text-yellow-500/60">
     Aplikasi Alarm Pasaran &bull; Running Neon Yellow & White Edition WIB
   </footer>
 
@@ -195,7 +192,6 @@
           <td class="py-3 px-3 font-bold text-yellow-100">${item.nama}</td>
           <td class="py-3 px-3 text-center text-yellow-400 font-semibold">${item.tutup} WIB</td>
           <td class="py-3 px-3 text-center text-emerald-400 font-semibold">${item.result} WIB</td>
-          <td class="py-3 px-3 text-center countdown-text text-yellow-200/90 font-mono">--:--:--</td>
           <td class="py-3 px-3 text-right">
             <span class="status-badge text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-yellow-500 border border-yellow-500/30">AKTIF</span>
           </td>
@@ -252,11 +248,6 @@
       if (alarmInterval) clearInterval(alarmInterval);
     }
 
-    function timeToSeconds(timeStr) {
-      const parts = timeStr.split(':');
-      return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60;
-    }
-
     function updateClock() {
       const now = new Date();
       const wibOptions = { timeZone: 'Asia/Jakarta', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
@@ -264,38 +255,12 @@
       
       document.getElementById('clock').innerText = timeStr;
 
-      const [h, m, s] = timeStr.split(':').map(Number);
-      const currentTotalSeconds = h * 3600 + m * 60 + s;
-      const currentHM = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      const currentHM = timeStr.substring(0, 5);
 
       jadwalData.forEach(item => {
         const row = document.getElementById(`row-${item.nama}`);
         if (!row) return;
         const badge = row.querySelector('.status-badge');
-        const countdownCell = row.querySelector('.countdown-text');
-
-        const tutupSec = timeToSeconds(item.tutup);
-        const resultSec = timeToSeconds(item.result);
-
-        let targetSec = tutupSec;
-        let eventType = "Menuju Tutup";
-
-        if (currentTotalSeconds >= tutupSec && currentTotalSeconds < resultSec) {
-          targetSec = resultSec;
-          eventType = "Menuju Result";
-        } else if (currentTotalSeconds >= resultSec) {
-          targetSec = tutupSec + 86400; 
-        }
-
-        let diffSec = targetSec - currentTotalSeconds;
-        if (diffSec < 0) diffSec = 0;
-
-        const remH = Math.floor(diffSec / 3600);
-        const remM = Math.floor((diffSec % 3600) / 60);
-        const remS = diffSec % 60;
-
-        const countdownFormatted = `${String(remH).padStart(2, '0')}j ${String(remM).padStart(2, '0')}m ${String(remS).padStart(2, '0')}d`;
-        countdownCell.innerHTML = `<span class="text-[11px] text-yellow-500/70">${eventType}:</span> <span class="text-yellow-300 font-bold">${countdownFormatted}</span>`;
 
         if (item.tutup === currentHM) {
           badge.className = "status-badge text-[10px] px-2 py-0.5 rounded bg-yellow-950 text-yellow-300 border border-yellow-400 font-bold animate-pulse";
