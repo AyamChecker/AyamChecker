@@ -3,50 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alarm & Jadwal Pasaran</title>
+  <title>Alarm & Jadwal Pasaran - Running Neon Yellow White</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* KONFIGURASI EFEK BORDER NEON BERGERAK MEMUTAR */
+    .neon-card-wrapper {
+      position: relative;
+      border-radius: 1rem;
+      overflow: hidden;
+      padding: 3px; /* Ketebalan garis neon */
+      background: #18181b;
+    }
+
+    /* Lapisan gradient yang diputar 360 derajat */
+    .neon-card-wrapper::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(
+        transparent,
+        #facc15,
+        #ffffff,
+        #facc15,
+        transparent 60%
+      );
+      animation: rotateNeon 3s linear infinite;
+    }
+
+    /* Lapisan dalam untuk menutupi bagian tengah */
+    .neon-card-inner {
+      position: relative;
+      background-color: #09090b;
+      border-radius: calc(1rem - 3px);
+      z-index: 1;
+    }
+
+    @keyframes rotateNeon {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    body {
+      background-color: #050505;
+      color: #fef08a;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #18181b; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #ca8a04; border-radius: 4px; }
+  </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col justify-between p-4 sm:p-6 font-sans">
+<body class="min-h-screen flex flex-col justify-between p-4 sm:p-6 font-sans">
 
   <!-- HEADER & JAM REALTIME -->
-  <header class="max-w-4xl w-full mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-6 mb-6 text-center shadow-xl">
-    <h1 class="text-xs sm:text-sm font-bold uppercase tracking-widest text-emerald-400 mb-1">
-      <i class="fa-solid fa-clock mr-1"></i> Waktu Realtime (WIB)
-    </h1>
-    <div id="clock" class="text-4xl sm:text-6xl font-mono font-extrabold text-white tracking-wider my-2">00:00:00</div>
-    
-    <div class="flex flex-wrap items-center justify-center gap-3 mt-4">
-      <button id="audio-btn" onclick="toggleAudio()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition shadow-lg flex items-center gap-2">
-        <i class="fa-solid fa-volume-high"></i> Aktifkan Suara Alarm
-      </button>
-      <span id="audio-status" class="text-xs text-zinc-400 font-medium">Status Suara: <b class="text-red-400">Nonaktif</b></span>
+  <header class="max-w-5xl w-full mx-auto mb-6 neon-card-wrapper">
+    <div class="neon-card-inner p-4 sm:p-6 text-center">
+      <h1 class="text-xs sm:text-sm font-bold uppercase tracking-widest text-yellow-400 mb-1">
+        <i class="fa-solid fa-clock mr-1"></i> Waktu Realtime (WIB)
+      </h1>
+      <div id="clock" class="text-4xl sm:text-6xl font-mono font-extrabold text-white tracking-wider my-2 drop-shadow-[0_0_15px_rgba(250,204,21,0.6)]">00:00:00</div>
+      
+      <div class="flex flex-wrap items-center justify-center gap-3 mt-4">
+        <button id="audio-btn" onclick="toggleAudio()" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-zinc-950 font-bold rounded-xl text-xs transition shadow-[0_0_15px_rgba(234,179,8,0.5)] flex items-center gap-2">
+          <i class="fa-solid fa-volume-high"></i> Aktifkan Suara Alarm
+        </button>
+        <span id="audio-status" class="text-xs text-yellow-200/70 font-medium">Status Suara: <b class="text-red-400">Nonaktif</b></span>
+      </div>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER: TABEL JADWAL -->
-  <main class="max-w-4xl w-full mx-auto flex-1 mb-6">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-xl space-y-4">
+  <!-- MAIN CONTAINER: TABEL JADWAL & COUNTDOWN -->
+  <main class="max-w-5xl w-full mx-auto flex-1 mb-6 neon-card-wrapper">
+    <div class="neon-card-inner p-4 sm:p-6 space-y-4">
       
-      <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b border-zinc-800 pb-4">
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b border-yellow-500/20 pb-4">
         <h2 class="text-base font-bold text-white uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-list-check text-emerald-400"></i> Daftar Jadwal Pasaran
+          <i class="fa-solid fa-hourglass-half text-yellow-400"></i> Jadwal Pasaran & Waktu Tunggu (Countdown)
         </h2>
-        <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Cari nama pasaran..." class="w-full sm:w-64 bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono">
+        <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Cari nama pasaran (contoh: TAIWAN)..." class="w-full sm:w-64 bg-zinc-950 border border-yellow-500/30 rounded-xl px-3 py-1.5 text-xs text-yellow-200 focus:outline-none focus:border-yellow-400 font-mono">
       </div>
 
       <!-- TABLE CONTAINER -->
-      <div class="overflow-x-auto max-h-[500px] overflow-y-auto pr-1">
+      <div class="overflow-x-auto max-h-[500px] overflow-y-auto pr-1 custom-scrollbar">
         <table class="w-full text-left text-xs border-collapse">
-          <thead class="sticky top-0 bg-zinc-900 border-b border-zinc-800 text-zinc-400 uppercase font-bold text-[11px]">
+          <thead class="sticky top-0 bg-zinc-950 border-b border-yellow-500/20 text-yellow-400 uppercase font-bold text-[11px] z-10">
             <tr>
               <th class="py-3 px-3">Pasaran</th>
               <th class="py-3 px-3 text-center">Tutup</th>
               <th class="py-3 px-3 text-center">Result</th>
+              <th class="py-3 px-3 text-center text-yellow-300">Waktu Tunggu (Countdown)</th>
               <th class="py-3 px-3 text-right">Status</th>
             </tr>
           </thead>
-          <tbody id="pasaran-table-body" class="divide-y divide-zinc-800/50 font-mono">
+          <tbody id="pasaran-table-body" class="divide-y divide-zinc-800/60 font-mono">
             <!-- Data dimasukkan via JS -->
           </tbody>
         </table>
@@ -56,21 +109,23 @@
   </main>
 
   <!-- POPUP NOTIFIKASI ALARM -->
-  <div id="alarm-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="bg-zinc-900 border border-emerald-500/50 p-6 rounded-2xl max-w-sm w-full text-center space-y-4 shadow-2xl animate-bounce">
-      <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-xl border border-emerald-500/30">
-        <i class="fa-solid fa-bell"></i>
+  <div id="alarm-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="neon-card-wrapper max-w-sm w-full animate-bounce">
+      <div class="neon-card-inner p-6 text-center space-y-4">
+        <div class="w-12 h-12 bg-yellow-500/20 text-yellow-400 rounded-2xl flex items-center justify-center mx-auto text-xl border border-yellow-400/50">
+          <i class="fa-solid fa-bell"></i>
+        </div>
+        <h3 id="modal-title" class="text-lg font-extrabold text-white uppercase tracking-wider">ALARM PASARAN</h3>
+        <p id="modal-msg" class="text-xs text-yellow-100 leading-relaxed font-mono"></p>
+        <button onclick="closeAlarmModal()" class="w-full py-2.5 bg-yellow-500 hover:bg-yellow-400 text-zinc-950 font-bold text-xs rounded-xl transition shadow-[0_0_15px_rgba(234,179,8,0.5)]">
+          MATIKAN ALARM
+        </button>
       </div>
-      <h3 id="modal-title" class="text-lg font-extrabold text-white uppercase tracking-wider">ALARM PASARAN</h3>
-      <p id="modal-msg" class="text-xs text-zinc-300 leading-relaxed font-mono"></p>
-      <button onclick="closeAlarmModal()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition">
-        MATIKAN ALARM
-      </button>
     </div>
   </div>
 
-  <footer class="max-w-4xl w-full mx-auto text-center text-xs text-zinc-600">
-    Aplikasi Alarm Pasaran &bull; Realtime WIB Indicator
+  <footer class="max-w-5xl w-full mx-auto text-center text-xs text-yellow-500/60">
+    Aplikasi Alarm Pasaran &bull; Running Neon Yellow & White Edition WIB
   </footer>
 
   <script>
@@ -126,30 +181,29 @@
 
     let audioContext = null;
     let audioEnabled = false;
-    let triggeredAlarms = {}; // Mencegah alarm bunyi berulang di menit yang sama
+    let triggeredAlarms = {};
 
-    // Render Tabel awal
     function renderTable() {
       const tbody = document.getElementById('pasaran-table-body');
       tbody.innerHTML = '';
 
       jadwalData.forEach(item => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-zinc-800/40 transition";
+        tr.className = "hover:bg-yellow-500/10 transition";
         tr.id = `row-${item.nama}`;
         tr.innerHTML = `
-          <td class="py-3 px-3 font-bold text-zinc-200">${item.nama}</td>
-          <td class="py-3 px-3 text-center text-amber-400 font-semibold">${item.tutup} WIB</td>
+          <td class="py-3 px-3 font-bold text-yellow-100">${item.nama}</td>
+          <td class="py-3 px-3 text-center text-yellow-400 font-semibold">${item.tutup} WIB</td>
           <td class="py-3 px-3 text-center text-emerald-400 font-semibold">${item.result} WIB</td>
+          <td class="py-3 px-3 text-center countdown-text text-yellow-200/90 font-mono">--:--:--</td>
           <td class="py-3 px-3 text-right">
-            <span class="status-badge text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-500 border border-zinc-700">MENUNGGU</span>
+            <span class="status-badge text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-yellow-500 border border-yellow-500/30">AKTIF</span>
           </td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    // Aktifkan Suara Audio (Fitur Autoplay Browser Policy)
     function toggleAudio() {
       if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -160,18 +214,17 @@
       const status = document.getElementById('audio-status');
 
       if (audioEnabled) {
-        btn.className = "px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl text-xs transition shadow-lg flex items-center gap-2";
+        btn.className = "px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl text-xs transition shadow-[0_0_15px_rgba(239,68,68,0.5)] flex items-center gap-2";
         btn.innerHTML = `<i class="fa-solid fa-volume-xmark"></i> Matikan Suara Alarm`;
-        status.innerHTML = `Status Suara: <b class="text-emerald-400">Aktif</b>`;
-        playBeep(800, 0.2); // Tes bunyi singkat
+        status.innerHTML = `Status Suara: <b class="text-yellow-300">Aktif</b>`;
+        playBeep(800, 0.2);
       } else {
-        btn.className = "px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition shadow-lg flex items-center gap-2";
+        btn.className = "px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-zinc-950 font-bold rounded-xl text-xs transition shadow-[0_0_15px_rgba(234,179,8,0.5)] flex items-center gap-2";
         btn.innerHTML = `<i class="fa-solid fa-volume-high"></i> Aktifkan Suara Alarm`;
         status.innerHTML = `Status Suara: <b class="text-red-400">Nonaktif</b>`;
       }
     }
 
-    // Fungsi Pembunyian Alarm Sederhana via Web Audio API
     function playBeep(freq = 1000, duration = 1) {
       if (!audioEnabled || !audioContext) return;
       try {
@@ -187,7 +240,6 @@
       } catch (e) { console.error(e); }
     }
 
-    // Pemicu Alarm Bunyi Berulang
     let alarmInterval = null;
     function startAlarmSound() {
       if (!audioEnabled) return;
@@ -200,24 +252,53 @@
       if (alarmInterval) clearInterval(alarmInterval);
     }
 
-    // Update Jam Realtime & Cek Alarm
+    function timeToSeconds(timeStr) {
+      const parts = timeStr.split(':');
+      return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60;
+    }
+
     function updateClock() {
       const now = new Date();
-      // Konversi ke zona WIB (Asia/Jakarta)
-      const options = { timeZone: 'Asia/Jakarta', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
-      const timeStr = now.toLocaleTimeString('id-ID', options).replace(/\./g, ':');
+      const wibOptions = { timeZone: 'Asia/Jakarta', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+      const timeStr = now.toLocaleTimeString('id-ID', wibOptions).replace(/\./g, ':');
       
       document.getElementById('clock').innerText = timeStr;
 
-      const currentHM = timeStr.substring(0, 5); // Format HH:MM
+      const [h, m, s] = timeStr.split(':').map(Number);
+      const currentTotalSeconds = h * 3600 + m * 60 + s;
+      const currentHM = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 
       jadwalData.forEach(item => {
         const row = document.getElementById(`row-${item.nama}`);
+        if (!row) return;
         const badge = row.querySelector('.status-badge');
+        const countdownCell = row.querySelector('.countdown-text');
 
-        // Cek Tutup
+        const tutupSec = timeToSeconds(item.tutup);
+        const resultSec = timeToSeconds(item.result);
+
+        let targetSec = tutupSec;
+        let eventType = "Menuju Tutup";
+
+        if (currentTotalSeconds >= tutupSec && currentTotalSeconds < resultSec) {
+          targetSec = resultSec;
+          eventType = "Menuju Result";
+        } else if (currentTotalSeconds >= resultSec) {
+          targetSec = tutupSec + 86400; 
+        }
+
+        let diffSec = targetSec - currentTotalSeconds;
+        if (diffSec < 0) diffSec = 0;
+
+        const remH = Math.floor(diffSec / 3600);
+        const remM = Math.floor((diffSec % 3600) / 60);
+        const remS = diffSec % 60;
+
+        const countdownFormatted = `${String(remH).padStart(2, '0')}j ${String(remM).padStart(2, '0')}m ${String(remS).padStart(2, '0')}d`;
+        countdownCell.innerHTML = `<span class="text-[11px] text-yellow-500/70">${eventType}:</span> <span class="text-yellow-300 font-bold">${countdownFormatted}</span>`;
+
         if (item.tutup === currentHM) {
-          badge.className = "status-badge text-[10px] px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/50 font-bold animate-pulse";
+          badge.className = "status-badge text-[10px] px-2 py-0.5 rounded bg-yellow-950 text-yellow-300 border border-yellow-400 font-bold animate-pulse";
           badge.innerText = "TUTUP!";
 
           if (!triggeredAlarms[item.nama + '-tutup-' + currentHM]) {
@@ -225,9 +306,8 @@
             triggeredAlarms[item.nama + '-tutup-' + currentHM] = true;
           }
         } 
-        // Cek Result
         else if (item.result === currentHM) {
-          badge.className = "status-badge text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/50 font-bold animate-pulse";
+          badge.className = "status-badge text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-400 font-bold animate-pulse";
           badge.innerText = "RESULT!";
 
           if (!triggeredAlarms[item.nama + '-result-' + currentHM]) {
@@ -235,16 +315,15 @@
             triggeredAlarms[item.nama + '-result-' + currentHM] = true;
           }
         } else {
-          badge.className = "status-badge text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-500 border border-zinc-700";
-          badge.innerText = "MENUNGGU";
+          badge.className = "status-badge text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-yellow-500 border border-yellow-500/30";
+          badge.innerText = "AKTIF";
         }
       });
     }
 
-    // Pemicu Modal & Getaran HP
     function triggerAlarm(namaPasaran, jenis, waktu) {
       startAlarmSound();
-      if (navigator.vibrate) navigator.vibrate([500, 250, 500, 250, 500]); // Getar HP
+      if (navigator.vibrate) navigator.vibrate([500, 250, 500, 250, 500]);
 
       document.getElementById('modal-title').innerText = `ALARM ${jenis}!`;
       document.getElementById('modal-msg').innerText = `Pasaran ${namaPasaran} telah memasuki waktu ${jenis} pada pukul ${waktu} WIB.`;
@@ -256,7 +335,6 @@
       document.getElementById('alarm-modal').style.display = 'none';
     }
 
-    // Filter Pencarian Pasaran
     function filterTable() {
       const input = document.getElementById('search-input').value.toUpperCase();
       const rows = document.querySelectorAll('#pasaran-table-body tr');
