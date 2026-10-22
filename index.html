@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Indonesian Typing Test (Bahasa Indonesia) - Check Your Typing Speed | Tribun Typing</title>
+  <title>Indonesian Typing Test & Multi-Language Competition | Tribun FastFingers</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
@@ -33,58 +33,48 @@
       <h1 class="text-sm font-extrabold tracking-wider text-white uppercase">TRIBUN FASTFINGERS</h1>
     </div>
     
-    <div class="flex items-center gap-4 text-xs">
-      <button onclick="switchMode('test')" id="btn-mode-test" class="px-3 py-1.5 bg-zinc-800 text-white font-bold rounded-lg border border-zinc-700">Test</button>
-      <button onclick="switchMode('competition')" id="btn-mode-comp" class="text-zinc-400 hover:text-white transition">Competition</button>
+    <div class="flex items-center gap-3 text-xs">
+      <!-- Pilihan Bahasa -->
+      <select id="language-select" onchange="changeLanguage()" class="bg-zinc-800 border border-zinc-700 text-white rounded-lg px-2 py-1.5 focus:outline-none">
+        <option value="id">Bahasa Indonesia</option>
+        <option value="en">English</option>
+        <option value="es">Español</option>
+      </select>
+      <button onclick="startSoloTest()" class="px-3 py-1.5 bg-zinc-800 text-white font-bold rounded-lg border border-zinc-700">Test Solo</button>
+      <button onclick="createCompetition()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition">Competition</button>
     </div>
   </header>
 
 
-  <!-- MAIN CONTAINER -->
+  <!-- MAIN CONTAINER (2 KOLOM PERSIS FASTFINGERS) -->
   <main class="max-w-7xl w-full mx-auto my-8 flex-1">
 
-    <!-- 1. VIEW MENU UTAMA / LOBBY -->
-    <div id="view-lobby" class="max-w-md mx-auto dark-card p-6 rounded-2xl space-y-4 text-center">
-      <h2 class="text-base font-bold text-white">Mulai Tes atau Kompetisi</h2>
-      <p class="text-xs text-zinc-400">Pilih mode tes mandiri atau buat room kompetisi untuk mengundang teman Anda.</p>
-      <div class="space-y-2">
-        <button onclick="startSoloTest()" class="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs rounded-xl transition border border-zinc-700">
-          Mulai Typing Test (Solo)
-        </button>
-        <button onclick="createCompetition()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition shadow-lg">
-          Buat Kompetisi & Share Link
-        </button>
-      </div>
-    </div>
-
-
-    <!-- 2. VIEW ARENA UTAMA (TATA LETAK 2 KOLOM PERSIS SEPERTI GAMBAR) -->
-    <div id="view-arena" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
       
       <!-- KOLOM KIRI: AREA MENGETIK (2/3 LEBAR) -->
       <div class="lg:col-span-2 space-y-4">
         
         <!-- Info Kompetitor & Bahasa -->
         <div class="text-xs text-zinc-400 flex items-center justify-between">
-          <span id="competitors-info"><i class="fa-solid fa-users mr-1"></i> 0 tests taken</span>
-          <span class="px-2 py-0.5 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded text-[11px] font-semibold">
-            <i class="fa-solid fa-globe mr-1"></i> Language: Indonesian
+          <span id="competitors-info"><i class="fa-solid fa-users mr-1"></i> 0 competitors in room</span>
+          <span class="px-2.5 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-md text-[11px] font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-globe"></i> Language: <span id="current-lang-text" class="text-white font-bold">Indonesian</span>
           </span>
         </div>
 
-        <!-- Timer Bar & WPM -->
+        <!-- Timer Bar & Live WPM -->
         <div class="flex items-center justify-between text-xs text-zinc-400 font-mono py-2 border-t border-b border-zinc-800">
           <div class="flex items-center gap-2 text-zinc-300">
             <i class="fa-regular fa-clock"></i>
-            <span id="timer-24h" class="font-bold text-white">23:59:59</span>
+            <span id="timer-24h" class="font-bold text-white">23:59:45</span>
           </div>
           <div class="flex items-center gap-4">
-            <span id="timer-60s" class="text-white font-bold">01:00</span>
-            <button onclick="resetCurrentTest()" class="hover:text-white transition" title="Ulangi"><i class="fa-solid fa-rotate-right"></i></button>
+            <span id="timer-60s" class="text-white font-bold text-base">01:00</span>
+            <button onclick="resetCurrentTest()" class="hover:text-white transition p-1" title="Ulangi"><i class="fa-solid fa-rotate-right"></i></button>
           </div>
         </div>
 
-        <!-- Text Box Area -->
+        <!-- Text Box Area (Teks Tidak Terbatas / Endless) -->
         <div class="dark-card p-6 rounded-2xl relative min-h-[160px] shadow-xl">
           <div id="text-container" class="font-serif text-xl sm:text-2xl leading-relaxed select-none h-[120px] overflow-hidden flex flex-wrap content-start custom-scrollbar"></div>
           <input type="text" id="hidden-input" class="absolute opacity-0 pointer-events-none" autofocus oninput="handleTyping(event)" onkeydown="handleKeyDown(event)">
@@ -97,7 +87,7 @@
         </div>
 
         <!-- Realtime Progress Lawan & Pemenang -->
-        <div id="progress-box" class="hidden dark-card p-4 rounded-xl space-y-2">
+        <div id="progress-box" class="dark-card p-4 rounded-xl space-y-2">
           <div class="flex justify-between items-center text-xs font-bold">
             <span class="text-zinc-400">Progress Lawan:</span>
             <span id="opp-wpm" class="text-emerald-400 font-mono">0 WPM</span>
@@ -112,7 +102,7 @@
 
 
       <!-- KOLOM KANAN: KOTAK SHARE THIS COMPETITION (1/3 LEBAR) -->
-      <div id="share-box-container" class="hidden space-y-4">
+      <div class="space-y-4">
         <div class="dark-card p-5 rounded-2xl space-y-4">
           <h3 class="text-sm font-bold text-white border-b border-zinc-800 pb-3">
             Share this competition
@@ -123,7 +113,7 @@
           </p>
 
           <div class="flex items-center gap-1 bg-zinc-900 border border-zinc-700/80 rounded-xl p-1">
-            <input type="text" id="share-link-input" readonly class="w-full bg-transparent px-3 py-1.5 text-xs text-zinc-300 font-mono focus:outline-none">
+            <input type="text" id="share-link-input" readonly class="w-full bg-transparent px-3 py-1.5 text-xs text-zinc-300 font-mono focus:outline-none" placeholder="Klik 'Competition' untuk salin link">
             <button onclick="copyShareLink()" class="p-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white rounded-lg transition border border-zinc-700">
               <i class="fa-regular fa-copy text-sm"></i>
             </button>
@@ -138,19 +128,49 @@
 
   <!-- FOOTER -->
   <footer class="max-w-7xl w-full mx-auto text-center text-xs text-zinc-600 pt-6 border-t border-zinc-900">
-    Tribun FastFingers &bull; Indonesian Edition
+    Tribun FastFingers &bull; Indonesian & Multi-Language Edition
   </footer>
 
 
   <script>
-    const indonesianWords = [
-      "baru", "jadi", "pada", "makanan", "anak", "nanti", "apa", "lagi", "sehingga",
-      "pusat", "ingin", "sekali", "memang", "mata", "khusus", "sedang", "pulang", "makan",
-      "minum", "tidur", "jalan", "rumah", "mobil", "motor", "buku", "meja", "kursi",
-      "pagi", "siang", "malam", "sore", "air", "api", "batu", "kayu", "daun", "bunga",
-      "orang", "bapak", "ibu", "teman", "kerja", "sekolah", "pasar", "toko", "uang"
-    ];
+    // Bank Kata Luas (200+ Kosakata Terpopuler)
+    const wordDictionaries = {
+      id: [
+        "yang", "untuk", "pada", "adalah", "dengan", "dengan", "dari", "dalam", "tidak", "akan", 
+        "juga", "atau", "oleh", "bisa", "sudah", "lebih", "dapat", "tahun", "banyak", "antara", 
+        "seperti", "hanya", "mereka", "harus", "saat", "sangat", "karena", "karena", "seperti", 
+        "orang", "maka", "satu", "dunia", "anak", "kita", "hari", "secara", "baru", "satu", 
+        "pemerintah", "satu", "sebagai", "dua", "ia", "dapat", "bagi", "sampai", "bahwa", "satu", 
+        "tempat", "satu", "telah", "bila", "besar", "kembali", "luar", "setelah", "sendiri", 
+        "waktu", "dapat", "namun", "tersebut", "masih", "lain", "baik", "terus", "jadi", "hidup", 
+        "muda", "lama", "tapi", "selalu", "jalan", "paling", "bukan", "mana", "tangan", "tamu", 
+        "kata", "melihat", "makanan", "rumah", "mobil", "motor", "buku", "meja", "kursi", "pagi", 
+        "siang", "malam", "sore", "air", "api", "batu", "kayu", "daun", "bunga", "bapak", "ibu", 
+        "teman", "kerja", "sekolah", "pasar", "toko", "uang", "baju", "celana", "sepatu", "topi", 
+        "lampu", "pintu", "jendela", "kertas", "pulpen", "satu", "dua", "tiga", "empat", "lima", 
+        "enam", "tujuh", "delapan", "sembilan", "sepuluh", "pusat", "ingin", "sekali", "memang", 
+        "mata", "khusus", "sedang", "pulang", "tidur", "makan", "minum", "teknologi", "komputer", 
+        "jaringan", "sistem", "informasi", "dunia", "negara", "rakyat", "bangsa", "keluarga", 
+        "cerita", "pikir", "suara", "kasih", "cinta", "semangat", "sukses", "impian", "rencana"
+      ],
+      en: [
+        "the", "be", "to", "of", "and", "a", "in", "that", "have", "I", "it", "for", "not", 
+        "on", "with", "he", "as", "you", "do", "at", "this", "but", "his", "by", "from", 
+        "they", "we", "say", "her", "she", "or", "an", "will", "my", "one", "all", "would", 
+        "there", "their", "what", "so", "up", "out", "if", "about", "who", "get", "which", 
+        "go", "me", "when", "make", "can", "like", "time", "no", "just", "him", "know", 
+        "take", "people", "into", "year", "your", "good", "some", "could", "them", "see", 
+        "other", "than", "then", "now", "look", "only", "come", "its", "over", "think", 
+        "also", "back", "after", "use", "two", "how", "our", "work", "first", "well", "way"
+      ],
+      es: [
+        "que", "de", "no", "a", "la", "el", "es", "y", "en", "lo", "un", "por", "qué",
+        "me", "una", "te", "los", "se", "con", "para", "mi", "está", "si", "bien", "esos",
+        "pero", "más", "hacer", "todo", "como", "nada", "casa", "vida", "mundo", "tiempo"
+      ]
+    };
 
+    let currentLang = 'id';
     let peer = null;
     let conn = null;
     let isHost = false;
@@ -165,7 +185,6 @@
     let isFinished = false;
 
     window.onload = () => {
-      // Menggunakan PeerJS dengan konfigurasi STUN publik agar koneksi stabil
       peer = new Peer({
         config: {
           iceServers: [
@@ -180,6 +199,8 @@
         const room = urlParams.get('room');
         if (room) {
           joinCompetitionAuto(room);
+        } else {
+          generateEndlessWords(150);
         }
       });
 
@@ -189,71 +210,21 @@
       });
     };
 
-    function startSoloTest() {
-      isMultiplayer = false;
-      document.getElementById('view-lobby').classList.add('hidden');
-      document.getElementById('view-arena').classList.remove('hidden');
-      document.getElementById('share-box-container').classList.add('hidden');
-      generateRandomWords(35);
+    function changeLanguage() {
+      currentLang = document.getElementById('language-select').value;
+      const langNames = { id: 'Indonesian', en: 'English', es: 'Español' };
+      document.getElementById('current-lang-text').innerText = langNames[currentLang];
+      resetCurrentTest();
     }
 
-    function createCompetition() {
-      isMultiplayer = true;
-      isHost = true;
-      const shareUrl = window.location.origin + window.location.pathname + '?room=' + peer.id;
-      document.getElementById('share-link-input').value = shareUrl;
-
-      document.getElementById('view-lobby').classList.add('hidden');
-      document.getElementById('view-arena').classList.remove('hidden');
-      document.getElementById('share-box-container').classList.remove('hidden');
-      document.getElementById('progress-box').classList.remove('hidden');
-
-      generateRandomWords(35);
-    }
-
-    function joinCompetitionAuto(roomCode) {
-      isMultiplayer = true;
-      isHost = false;
-      conn = peer.connect(roomCode, { reliable: true });
-
-      document.getElementById('share-link-input').value = window.location.href;
-      document.getElementById('view-lobby').classList.add('hidden');
-      document.getElementById('view-arena').classList.remove('hidden');
-      document.getElementById('share-box-container').classList.remove('hidden');
-      document.getElementById('progress-box').classList.remove('hidden');
-      document.getElementById('overlay-msg').innerText = "Menghubungkan ke Room Kompetisi...";
-
-      setupConnection();
-    }
-
-    function setupConnection() {
-      if (!conn) return;
-
-      conn.on('open', () => {
-        document.getElementById('competitors-info').innerHTML = `<i class="fa-solid fa-users mr-1"></i> 2 competitors in room`;
-        document.getElementById('overlay-msg').innerText = "Klik di sini atau mulai mengetik untuk memulai tes";
-
-        if (isHost) {
-          generateRandomWords(35);
-        }
-      });
-
-      conn.on('data', (data) => {
-        if (data.type === 'words') {
-          renderWords(data.words);
-        } else if (data.type === 'progress') {
-          document.getElementById('opp-bar').style.width = data.progress + '%';
-          document.getElementById('opp-wpm').innerText = data.wpm + ' WPM';
-        } else if (data.type === 'finished') {
-          showWinner("Lawan telah menyelesaikan pengetikan terlebih dahulu! Lawan Menang.");
-        }
-      });
-    }
-
-    function generateRandomWords(count) {
+    // Fungsi pengacak kata dinamis tanpa batas
+    function generateEndlessWords(count) {
+      const dict = wordDictionaries[currentLang] || wordDictionaries['id'];
       const selectedWords = [];
       for (let i = 0; i < count; i++) {
-        selectedWords.push(indonesianWords[Math.floor(Math.random() * indonesianWords.length)]);
+        // Menggunakan Math.random() murni agar urutan kata selalu berbeda
+        const randomIndex = Math.floor(Math.random() * dict.length);
+        selectedWords.push(dict[randomIndex]);
       }
       renderWords(selectedWords);
 
@@ -292,6 +263,48 @@
       if (allSpans.length > 0) {
         allSpans[0].classList.add('char-current');
       }
+    }
+
+    function createCompetition() {
+      isMultiplayer = true;
+      isHost = true;
+      const shareUrl = window.location.origin + window.location.pathname + '?room=' + peer.id;
+      document.getElementById('share-link-input').value = shareUrl;
+      generateEndlessWords(150);
+    }
+
+    function joinCompetitionAuto(roomCode) {
+      isMultiplayer = true;
+      isHost = false;
+      conn = peer.connect(roomCode, { reliable: true });
+
+      document.getElementById('share-link-input').value = window.location.href;
+      document.getElementById('overlay-msg').innerText = "Menghubungkan ke Room Kompetisi...";
+      setupConnection();
+    }
+
+    function setupConnection() {
+      if (!conn) return;
+
+      conn.on('open', () => {
+        document.getElementById('competitors-info').innerHTML = `<i class="fa-solid fa-users mr-1"></i> 2 competitors in room`;
+        document.getElementById('overlay-msg').innerText = "Klik di sini atau mulai mengetik untuk memulai tes";
+
+        if (isHost) {
+          generateEndlessWords(150);
+        }
+      });
+
+      conn.on('data', (data) => {
+        if (data.type === 'words') {
+          renderWords(data.words);
+        } else if (data.type === 'progress') {
+          document.getElementById('opp-bar').style.width = data.progress + '%';
+          document.getElementById('opp-wpm').innerText = data.wpm + ' WPM';
+        } else if (data.type === 'finished') {
+          showWinner("Lawan telah menyelesaikan tes terlebih dahulu!");
+        }
+      });
     }
 
     function focusInput() {
@@ -356,9 +369,6 @@
       if (charIndex < allSpans.length) {
         allSpans[charIndex].classList.add('char-current');
         allSpans[charIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      } else {
-        // MENANG KARENA SELESAI PERTAMA
-        finishAsWinner();
       }
 
       sendProgress();
@@ -374,16 +384,7 @@
       }
     }
 
-    function finishAsWinner() {
-      isFinished = true;
-      clearInterval(timer);
-      showWinnerBanner("SELAMAT! Anda Menang dan Menyelesaikan Tes Tercepat!");
-      if (isMultiplayer && conn && conn.open) {
-        conn.send({ type: 'finished' });
-      }
-    }
-
-    function showWinnerBanner(message) {
+    function showWinner(message) {
       isFinished = true;
       clearInterval(timer);
       const banner = document.getElementById('winner-banner');
@@ -396,7 +397,9 @@
     function endTest() {
       isFinished = true;
       clearInterval(timer);
-      showWinnerBanner("Waktu Habis! Tes Berakhir.");
+      const elapsedMinutes = 1;
+      const finalWpm = Math.round((correctChars / 5) / elapsedMinutes);
+      showWinner(`Waktu Habis! Hasil Anda: ${finalWpm} WPM.`);
     }
 
     function resetCurrentTest() {
@@ -411,19 +414,19 @@
       document.getElementById('winner-banner').classList.add('hidden');
       document.getElementById('start-overlay').style.display = 'flex';
       document.getElementById('overlay-msg').innerText = "Klik di sini atau mulai mengetik untuk memulai tes";
-      generateRandomWords(35);
+      generateEndlessWords(150);
     }
 
-    function switchMode(mode) {
-      if (mode === 'test') {
-        location.href = window.location.pathname;
-      } else {
-        createCompetition();
-      }
+    function startSoloTest() {
+      isMultiplayer = false;
+      resetCurrentTest();
     }
 
     function copyShareLink() {
       const linkInput = document.getElementById('share-link-input');
+      if (!linkInput.value) {
+        createCompetition();
+      }
       linkInput.select();
       navigator.clipboard.writeText(linkInput.value);
       alert("Link kompetisi berhasil disalin! Bagikan ke teman Anda.");
