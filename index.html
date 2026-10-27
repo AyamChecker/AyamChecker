@@ -7,39 +7,39 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* SOLUSI BORDER NEON BERGERAK MEMUTAR ANTI-DISTORSI / TAHAN ZOOM (CTRL + -) */
-    .neon-card-wrapper {
+    /* BORDER NEON BERGERAK PAS SESUAI BINGKAI KOTAK (ANTI BOCOR SAAT ZOOM OUT) */
+    .app-card-wrapper {
       position: relative;
-      border-radius: 1rem;
-      overflow: hidden; /* Memastikan cahaya tidak melimpah keluar saat zoom out */
-      padding: 3px;
+      border-radius: 1.25rem;
+      overflow: hidden; /* Mengunci lampu neon agar tepat di batas kotak */
+      padding: 3px; /* Ketebalan garis neon */
       background: #18181b;
       isolation: isolate;
     }
 
-    .neon-card-wrapper::before {
+    .app-card-wrapper::before {
       content: '';
       position: absolute;
-      top: -100%;
-      left: -100%;
-      width: 300%;
-      height: 300%;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
       background: conic-gradient(
         from 0deg,
         transparent 0deg,
-        transparent 280deg,
-        #facc15 320deg,
-        #ffffff 345deg,
+        transparent 270deg,
+        #facc15 310deg,
+        #ffffff 340deg,
         #facc15 360deg
       );
-      animation: rotateNeon 3s linear infinite;
+      animation: rotateNeon 3.5s linear infinite;
       z-index: 0;
     }
 
-    .neon-card-inner {
+    .app-card-inner {
       position: relative;
       background-color: #09090b;
-      border-radius: calc(1rem - 3px);
+      border-radius: calc(1.25rem - 3px);
       z-index: 1;
     }
 
@@ -60,58 +60,59 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 sm:p-6 font-sans">
 
-  <!-- HEADER & JAM REALTIME -->
-  <header class="max-w-4xl w-full mx-auto mb-6 neon-card-wrapper">
-    <div class="neon-card-inner p-4 sm:p-6 text-center">
-      <h1 class="text-xs sm:text-sm font-bold uppercase tracking-widest text-yellow-400 mb-1">
-        <i class="fa-solid fa-clock mr-1"></i> Waktu Realtime (WIB)
-      </h1>
-      <div id="clock" class="text-4xl sm:text-6xl font-mono font-extrabold text-white tracking-wider my-2 drop-shadow-[0_0_15px_rgba(250,204,21,0.6)]">00:00:00</div>
-      
-      <div class="flex flex-wrap items-center justify-center gap-3 mt-4">
-        <button id="audio-btn" onclick="toggleAudio()" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-zinc-950 font-bold rounded-xl text-xs transition shadow-[0_0_15px_rgba(234,179,8,0.5)] flex items-center gap-2">
-          <i class="fa-solid fa-volume-high"></i> Aktifkan Suara Alarm
-        </button>
-        <span id="audio-status" class="text-xs text-yellow-200/70 font-medium">Status Suara: <b class="text-red-400">Nonaktif</b></span>
-      </div>
+  <!-- WAPPER UTAMA DENGAN NEON PAS DI BINGKAI KOTAK TERLUR -->
+  <div class="max-w-4xl w-full mx-auto my-auto app-card-wrapper">
+    <div class="app-card-inner p-4 sm:p-6 space-y-6">
+
+      <!-- HEADER & JAM REALTIME -->
+      <header class="bg-zinc-950/80 border border-yellow-500/20 rounded-2xl p-4 sm:p-6 text-center shadow-lg">
+        <h1 class="text-xs sm:text-sm font-bold uppercase tracking-widest text-yellow-400 mb-1">
+          <i class="fa-solid fa-clock mr-1"></i> Waktu Realtime (WIB)
+        </h1>
+        <div id="clock" class="text-4xl sm:text-6xl font-mono font-extrabold text-white tracking-wider my-2 drop-shadow-[0_0_15px_rgba(250,204,21,0.6)]">00:00:00</div>
+        
+        <div class="flex flex-wrap items-center justify-center gap-3 mt-4">
+          <button id="audio-btn" onclick="toggleAudio()" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-zinc-950 font-bold rounded-xl text-xs transition shadow-[0_0_15px_rgba(234,179,8,0.5)] flex items-center gap-2">
+            <i class="fa-solid fa-volume-high"></i> Aktifkan Suara Alarm
+          </button>
+          <span id="audio-status" class="text-xs text-yellow-200/70 font-medium">Status Suara: <b class="text-red-400">Nonaktif</b></span>
+        </div>
+      </header>
+
+      <!-- MAIN CONTAINER: TABEL JADWAL -->
+      <main class="bg-zinc-950/80 border border-yellow-500/20 rounded-2xl p-4 sm:p-6 space-y-4 shadow-lg">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b border-yellow-500/20 pb-4">
+          <h2 class="text-base font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-yellow-400"></i> Daftar Jadwal Pasaran & Live Draw
+          </h2>
+          <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Cari nama pasaran..." class="w-full sm:w-64 bg-zinc-900 border border-yellow-500/30 rounded-xl px-3 py-1.5 text-xs text-yellow-200 focus:outline-none focus:border-yellow-400 font-mono">
+        </div>
+
+        <!-- TABLE CONTAINER -->
+        <div class="overflow-x-auto max-h-[480px] overflow-y-auto pr-1 custom-scrollbar">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead class="sticky top-0 bg-zinc-950 border-b border-yellow-500/20 text-yellow-400 uppercase font-bold text-[11px] z-10">
+              <tr>
+                <th class="py-3 px-3">Pasaran (Klik untuk Live Draw)</th>
+                <th class="py-3 px-3 text-center">Tutup</th>
+                <th class="py-3 px-3 text-center">Result</th>
+                <th class="py-3 px-3 text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody id="pasaran-table-body" class="divide-y divide-zinc-800/60 font-mono">
+              <!-- Data dimasukkan via JS -->
+            </tbody>
+          </table>
+        </div>
+      </main>
+
     </div>
-  </header>
-
-  <!-- MAIN CONTAINER: TABEL JADWAL -->
-  <main class="max-w-4xl w-full mx-auto flex-1 mb-6 neon-card-wrapper">
-    <div class="neon-card-inner p-4 sm:p-6 space-y-4">
-      
-      <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b border-yellow-500/20 pb-4">
-        <h2 class="text-base font-bold text-white uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-list-check text-yellow-400"></i> Daftar Jadwal Pasaran & Live Draw
-        </h2>
-        <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Cari nama pasaran..." class="w-full sm:w-64 bg-zinc-950 border border-yellow-500/30 rounded-xl px-3 py-1.5 text-xs text-yellow-200 focus:outline-none focus:border-yellow-400 font-mono">
-      </div>
-
-      <!-- TABLE CONTAINER -->
-      <div class="overflow-x-auto max-h-[500px] overflow-y-auto pr-1 custom-scrollbar">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead class="sticky top-0 bg-zinc-950 border-b border-yellow-500/20 text-yellow-400 uppercase font-bold text-[11px] z-10">
-            <tr>
-              <th class="py-3 px-3">Pasaran (Klik untuk Live Draw)</th>
-              <th class="py-3 px-3 text-center">Tutup</th>
-              <th class="py-3 px-3 text-center">Result</th>
-              <th class="py-3 px-3 text-right">Status</th>
-            </tr>
-          </thead>
-          <tbody id="pasaran-table-body" class="divide-y divide-zinc-800/60 font-mono">
-            <!-- Data dimasukkan via JS -->
-          </tbody>
-        </table>
-      </div>
-
-    </div>
-  </main>
+  </div>
 
   <!-- POPUP NOTIFIKASI ALARM -->
   <div id="alarm-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="neon-card-wrapper max-w-sm w-full animate-bounce">
-      <div class="neon-card-inner p-6 text-center space-y-4">
+    <div class="app-card-wrapper max-w-sm w-full animate-bounce">
+      <div class="app-card-inner p-6 text-center space-y-4">
         <div class="w-12 h-12 bg-yellow-500/20 text-yellow-400 rounded-2xl flex items-center justify-center mx-auto text-xl border border-yellow-400/50">
           <i class="fa-solid fa-bell"></i>
         </div>
@@ -124,7 +125,7 @@
     </div>
   </div>
 
-  <footer class="max-w-4xl w-full mx-auto text-center text-xs text-yellow-500/60">
+  <footer class="max-w-4xl w-full mx-auto text-center text-xs text-yellow-500/60 mt-4">
     Aplikasi Alarm Pasaran &bull; Running Neon Yellow & White Edition WIB
   </footer>
 
