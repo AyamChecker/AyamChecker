@@ -80,7 +80,7 @@
       
       <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b border-yellow-500/20 pb-4">
         <h2 class="text-base font-bold text-white uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-list-check text-yellow-400"></i> Daftar Jadwal Pasaran
+          <i class="fa-solid fa-list-check text-yellow-400"></i> Daftar Jadwal Pasaran & Live Draw
         </h2>
         <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Cari nama pasaran..." class="w-full sm:w-64 bg-zinc-950 border border-yellow-500/30 rounded-xl px-3 py-1.5 text-xs text-yellow-200 focus:outline-none focus:border-yellow-400 font-mono">
       </div>
@@ -90,7 +90,7 @@
         <table class="w-full text-left text-xs border-collapse">
           <thead class="sticky top-0 bg-zinc-950 border-b border-yellow-500/20 text-yellow-400 uppercase font-bold text-[11px] z-10">
             <tr>
-              <th class="py-3 px-3">Pasaran</th>
+              <th class="py-3 px-3">Pasaran (Klik untuk Live Draw)</th>
               <th class="py-3 px-3 text-center">Tutup</th>
               <th class="py-3 px-3 text-center">Result</th>
               <th class="py-3 px-3 text-right">Status</th>
@@ -127,53 +127,53 @@
 
   <script>
     const jadwalData = [
-      { nama: "NEWYORKEVE", tutup: "09:10", result: "09:45" },
-      { nama: "KENTUCKYEVE", tutup: "09:45", result: "10:05" },
-      { nama: "CAROLINAEVE", tutup: "10:10", result: "10:22" },
-      { nama: "TASMANIA10", tutup: "10:30", result: "11:00" },
-      { nama: "CAMBODIA", tutup: "11:20", result: "11:50" },
-      { nama: "OREGON12", tutup: "11:45", result: "12:00" },
-      { nama: "BULLSEYE", tutup: "11:45", result: "12:30" },
-      { nama: "FUJIAN12", tutup: "12:00", result: "12:30" },
-      { nama: "TASMANIA13", tutup: "12:30", result: "13:00" },
-      { nama: "TOTOMACAU13", tutup: "13:00", result: "13:10" },
-      { nama: "SYDNEY", tutup: "13:49", result: "13:50" },
-      { nama: "LIBANON", tutup: "14:30", result: "15:00" },
-      { nama: "TOTOMACAU5D15", tutup: "15:15", result: "15:25" },
-      { nama: "CHINA", tutup: "15:00", result: "15:30" },
-      { nama: "FUJIAN15", tutup: "15:15", result: "15:45" },
-      { nama: "TOTOMACAU16", tutup: "16:00", result: "16:10" },
-      { nama: "TASMANIA16", tutup: "16:00", result: "16:30" },
-      { nama: "KINGKONG17", tutup: "17:00", result: "17:05" },
-      { nama: "JAPAN", tutup: "16:50", result: "17:20" },
-      { nama: "SINGAPORE", tutup: "17:25", result: "17:45" },
-      { nama: "KAMBOJA", tutup: "18:15", result: "18:30" },
-      { nama: "TOTOMACAU19", tutup: "19:00", result: "19:10" },
-      { nama: "FUJIAN20", tutup: "19:30", result: "20:00" },
-      { nama: "PCSO", tutup: "19:50", result: "20:10" },
-      { nama: "TAIWAN", tutup: "20:15", result: "20:45" },
-      { nama: "YORDANIA4D", tutup: "20:30", result: "21:00" },
-      { nama: "TOTOMACAU5D21", tutup: "21:25", result: "21:25" },
-      { nama: "CHICAGODAY", tutup: "21:00", result: "21:30" },
-      { nama: "TOTOMACAU22", tutup: "22:00", result: "22:10" },
-      { nama: "TOTOMACAU23", tutup: "23:00", result: "23:10" },
-      { nama: "HONGKONG", tutup: "22:59", result: "23:00" },
-      { nama: "JAKARTA", tutup: "22:30", result: "23:30" },
-      { nama: "KINGKONG23", tutup: "23:30", result: "23:35" },
-      { nama: "FUJIAN23", tutup: "23:15", result: "23:45" },
-      { nama: "TOTOMACAU00", tutup: "00:01", result: "00:10" },
-      { nama: "KENTUCKYMID", tutup: "00:05", result: "00:30" },
-      { nama: "FLORIDAMID", tutup: "00:15", result: "00:40" },
-      { nama: "TURKI", tutup: "00:45", result: "01:20" },
-      { nama: "NEWYORKMID", tutup: "01:05", result: "01:45" },
-      { nama: "CAROLINADAY", tutup: "01:45", result: "02:00" },
-      { nama: "MAROKO", tutup: "02:30", result: "03:00" },
-      { nama: "OREGON3", tutup: "02:45", result: "03:00" },
-      { nama: "OREGON6", tutup: "05:45", result: "06:00" },
-      { nama: "TASMANIA06", tutup: "06:30", result: "07:00" },
-      { nama: "CHICAGONIGHT", tutup: "07:30", result: "08:00" },
-      { nama: "FLORIDAEVE", tutup: "08:35", result: "08:55" },
-      { nama: "OREGON9", tutup: "08:45", result: "09:00" }
+      { nama: "NEWYORK EVE", tutup: "09:10", result: "09:45", link: "https://nylottery.ny.gov/draw-game?game=win4" },
+      { nama: "KENTUCKY EVE", tutup: "09:45", result: "10:05", link: "https://www.lotteryusa.com/kentucky/pick-4/" },
+      { nama: "CAROLINA EVE", tutup: "10:10", result: "10:22", link: "https://www.wral.com/evening-pick-3-pick-4-and-cash-5/1075494/" },
+      { nama: "TASMANIA 10", tutup: "10:30", result: "11:00", link: "http://www.tasmanialottery.com/" },
+      { nama: "CAMBODIA", tutup: "11:20", result: "11:50", link: "https://www.magnumcambodia.com/" },
+      { nama: "OREGON12", tutup: "11:45", result: "12:00", link: "https://www.oregonlottery.org/pick-4/winning-numbers/" },
+      { nama: "BULLSEYE", tutup: "11:45", result: "12:30", link: "https://mylotto.co.nz/results/bullseye" },
+      { nama: "FUJIAN 12", tutup: "12:00", result: "12:30", link: "http://www.fujianlottery.com/" },
+      { nama: "TASMANIA 13", tutup: "12:30", result: "13:00", link: "http://www.tasmanialottery.com/" },
+      { nama: "TOTOMACAU13", tutup: "13:00", result: "13:10", link: "https://www.totomacaupools.club/result.php" },
+      { nama: "SYDNEY", tutup: "13:49", result: "13:50", link: "https://sydneylotto.com/" },
+      { nama: "LIBANON", tutup: "14:30", result: "15:00", link: "https://libanonpools.com/pool/draw" },
+      { nama: "TOTOMACAU5D15", tutup: "15:15", result: "15:25", link: "https://www.totomacaupools.club/result.php" },
+      { nama: "CHINA", tutup: "15:00", result: "15:30", link: "https://www.chinapools.asia/" },
+      { nama: "FUJIAN 15", tutup: "15:15", result: "15:45", link: "http://www.fujianlottery.com/" },
+      { nama: "TOTOMACAU16", tutup: "16:00", result: "16:10", link: "https://www.totomacaupools.club/result.php" },
+      { nama: "TASMANIA 16", tutup: "16:00", result: "16:30", link: "http://www.tasmanialottery.com" },
+      { nama: "KINGKONG17", tutup: "17:00", result: "17:05", link: "https://kingkongpools.com/results" },
+      { nama: "JAPAN", tutup: "16:50", result: "17:20", link: "https://japanpools.online/" },
+      { nama: "SINGAPORE", tutup: "17:25", result: "17:45", link: "https://www.singaporepools.com.sg/en/product/Pages/4d_results.aspx" },
+      { nama: "KAMBOJA", tutup: "18:15", result: "18:30", link: "https://kambojapools.com/pool/draw" },
+      { nama: "TOTOMACAU19", tutup: "19:00", result: "19:10", link: "https://www.totomacaupools.club/result.php" },
+      { nama: "FUJIAN 20", tutup: "19:30", result: "20:00", link: "http://www.fujianlottery.com/" },
+      { nama: "PCSO", tutup: "19:50", result: "20:10", link: "https://www.pcso.gov.ph/SearchLottoResult.aspx" },
+      { nama: "TAIWAN", tutup: "20:15", result: "20:45", link: "https://taiwan-lotto.com/" },
+      { nama: "YORDANIA4D", tutup: "20:30", result: "21:00", link: "https://www.yordania4d.com/pool/draw" },
+      { nama: "TOTOMACAU5D21", tutup: "21:25", result: "21:25", link: "https://kick.com/search?query=studio-live-game" },
+      { nama: "CHICAGODAY", tutup: "21:00", result: "21:30", link: "https://www.chicagolottery.world/" },
+      { nama: "TOTOMACAU22", tutup: "22:00", result: "22:10", link: "https://www.totomacaupools.club/result.php" },
+      { nama: "TOTOMACAU23", tutup: "23:00", result: "23:10", link: "https://www.totomacaupools.club/result.php" },
+      { nama: "HONGKONG", tutup: "22:59", result: "23:00", link: "https://kick.com/search?query=hongkong-lotto-official" },
+      { nama: "JAKARTA", tutup: "22:30", result: "23:30", link: "https://jakartapools.com/" },
+      { nama: "KINGKONG23", tutup: "23:30", result: "23:35", link: "https://kingkongpools.com/results" },
+      { nama: "FUJIAN23", tutup: "23:15", result: "23:45", link: "http://www.fujianlottery.com/" },
+      { nama: "TOTOMACAU00", tutup: "00:01", result: "00:10", link: "https://www.totomacaupools.club/result.php" },
+      { nama: "KENTUCKYMID", tutup: "00:05", result: "00:30", link: "https://www.lotteryusa.com/kentucky/midday-pick-4/" },
+      { nama: "FLORIDAMID", tutup: "00:15", result: "00:40", link: "https://www.lotteryusa.com/florida/midday-pick-4/" },
+      { nama: "TURKI", tutup: "00:45", result: "01:20", link: "https://turkipools.com/" },
+      { nama: "NEWYORKMID", tutup: "01:05", result: "01:45", link: "https://nylottery.ny.gov/draw-game/?game=win4" },
+      { nama: "CAROLINADAY", tutup: "01:45", result: "02:00", link: "https://www.lotteryusa.com/north-carolina/midday-pick-4/" },
+      { nama: "MAROKO", tutup: "02:30", result: "03:00", link: "https://marokopools.com/" },
+      { nama: "OREGON3", tutup: "02:45", result: "03:00", link: "https://www.oregonlottery.org/pick-4/winning-numbers/" },
+      { nama: "OREGON6", tutup: "05:45", result: "06:00", link: "https://www.oregonlottery.org/pick-4/winning-numbers/" },
+      { nama: "TASMANIA06", tutup: "06:30", result: "07:00", link: "http://www.tasmanialottery.com/" },
+      { nama: "CHICAGONIGHT", tutup: "07:30", result: "08:00", link: "https://www.chicagolottery.world/" },
+      { nama: "FLORIDAEVE", tutup: "08:35", result: "08:55", link: "https://www.lotteryusa.com/florida/pick-4/" },
+      { nama: "OREGON9", tutup: "08:45", result: "09:00", link: "https://www.oregonlottery.org/pick-4/winning-numbers/" }
     ];
 
     let audioContext = null;
@@ -187,9 +187,13 @@
       jadwalData.forEach(item => {
         const tr = document.createElement('tr');
         tr.className = "hover:bg-yellow-500/10 transition";
-        tr.id = `row-${item.nama}`;
+        tr.id = `row-${item.nama.replace(/\s+/g, '-')}`;
         tr.innerHTML = `
-          <td class="py-3 px-3 font-bold text-yellow-100">${item.nama}</td>
+          <td class="py-3 px-3 font-bold">
+            <a href="${item.link}" target="_blank" class="text-yellow-200 hover:text-white underline decoration-yellow-500/50 hover:decoration-white flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-external-link-alt text-[10px] text-yellow-400"></i> ${item.nama}
+            </a>
+          </td>
           <td class="py-3 px-3 text-center text-yellow-400 font-semibold">${item.tutup} WIB</td>
           <td class="py-3 px-3 text-center text-emerald-400 font-semibold">${item.result} WIB</td>
           <td class="py-3 px-3 text-right">
@@ -258,7 +262,8 @@
       const currentHM = timeStr.substring(0, 5);
 
       jadwalData.forEach(item => {
-        const row = document.getElementById(`row-${item.nama}`);
+        const rowId = `row-${item.nama.replace(/\s+/g, '-')}`;
+        const row = document.getElementById(rowId);
         if (!row) return;
         const badge = row.querySelector('.status-badge');
 
@@ -267,7 +272,7 @@
           badge.innerText = "TUTUP!";
 
           if (!triggeredAlarms[item.nama + '-tutup-' + currentHM]) {
-            triggerAlarm(item.nama, "TUTUP", item.tutup);
+            triggerAlarm(item.nama, "TUTUP", item.tutup, item.link);
             triggeredAlarms[item.nama + '-tutup-' + currentHM] = true;
           }
         } 
@@ -276,7 +281,7 @@
           badge.innerText = "RESULT!";
 
           if (!triggeredAlarms[item.nama + '-result-' + currentHM]) {
-            triggerAlarm(item.nama, "RESULT", item.result);
+            triggerAlarm(item.nama, "RESULT", item.result, item.link);
             triggeredAlarms[item.nama + '-result-' + currentHM] = true;
           }
         } else {
@@ -286,12 +291,12 @@
       });
     }
 
-    function triggerAlarm(namaPasaran, jenis, waktu) {
+    function triggerAlarm(namaPasaran, jenis, waktu, link) {
       startAlarmSound();
       if (navigator.vibrate) navigator.vibrate([500, 250, 500, 250, 500]);
 
       document.getElementById('modal-title').innerText = `ALARM ${jenis}!`;
-      document.getElementById('modal-msg').innerText = `Pasaran ${namaPasaran} telah memasuki waktu ${jenis} pada pukul ${waktu} WIB.`;
+      document.getElementById('modal-msg').innerHTML = `Pasaran <b class="text-white">${namaPasaran}</b> telah memasuki waktu ${jenis} pada pukul ${waktu} WIB.<br><br><a href="${link}" target="_blank" class="text-yellow-400 underline font-bold">Klik di sini untuk buka Live Draw</a>`;
       document.getElementById('alarm-modal').style.display = 'flex';
     }
 
