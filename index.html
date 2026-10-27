@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alarm & Jadwal Pasaran - Running Neon Yellow White</title>
+  <title>Alarm & Jadwal Pasaran - Vibrate Neon Edition</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* BORDER NEON BERGERAK PAS SESUAI BINGKAI KOTAK (ANTI BOCOR SAAT ZOOM OUT) */
+    /* BORDER NEON BERGERAK PAS SESUAI BINGKAI KOTAK */
     .app-card-wrapper {
       position: relative;
       border-radius: 1.25rem;
-      overflow: hidden; /* Mengunci lampu neon agar tepat di batas kotak */
-      padding: 3px; /* Ketebalan garis neon */
+      overflow: hidden;
+      padding: 3px;
       background: #18181b;
       isolation: isolate;
     }
@@ -29,7 +29,7 @@
         transparent 0deg,
         transparent 270deg,
         #facc15 310deg,
-        #ffffff 340deg,
+        #ffffff 345deg,
         #facc15 360deg
       );
       animation: rotateNeon 3.5s linear infinite;
@@ -48,6 +48,20 @@
       100% { transform: rotate(360deg); }
     }
 
+    /* ANIMASI GETAR UNTUK POPUP ALARM (DIAM DI TEMPAT, BERGETAR) */
+    @keyframes vibrateModal {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(-3px, 2px); }
+      40% { transform: translate(3px, -2px); }
+      60% { transform: translate(-2px, -3px); }
+      80% { transform: translate(3px, 3px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    .modal-vibrate {
+      animation: vibrateModal 0.25s infinite ease-in-out;
+    }
+
     body {
       background-color: #050505;
       color: #fef08a;
@@ -60,7 +74,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 sm:p-6 font-sans">
 
-  <!-- WAPPER UTAMA DENGAN NEON PAS DI BINGKAI KOTAK TERLUR -->
+  <!-- WRAPPER UTAMA -->
   <div class="max-w-4xl w-full mx-auto my-auto app-card-wrapper">
     <div class="app-card-inner p-4 sm:p-6 space-y-6">
 
@@ -111,7 +125,7 @@
 
   <!-- POPUP NOTIFIKASI ALARM -->
   <div id="alarm-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="app-card-wrapper max-w-sm w-full animate-bounce">
+    <div class="app-card-wrapper max-w-sm w-full modal-vibrate">
       <div class="app-card-inner p-6 text-center space-y-4">
         <div class="w-12 h-12 bg-yellow-500/20 text-yellow-400 rounded-2xl flex items-center justify-center mx-auto text-xl border border-yellow-400/50">
           <i class="fa-solid fa-bell"></i>
@@ -126,7 +140,7 @@
   </div>
 
   <footer class="max-w-4xl w-full mx-auto text-center text-xs text-yellow-500/60 mt-4">
-    Aplikasi Alarm Pasaran &bull; Running Neon Yellow & White Edition WIB
+    Aplikasi Alarm Pasaran &bull; Vibrate Neon Edition WIB
   </footer>
 
   <script>
@@ -169,7 +183,7 @@
       { nama: "KENTUCKYMID", tutup: "00:05", result: "00:30", link: "https://www.lotteryusa.com/kentucky/midday-pick-4/" },
       { nama: "FLORIDAMID", tutup: "00:15", result: "00:40", link: "https://www.lotteryusa.com/florida/midday-pick-4/" },
       { nama: "TURKI", tutup: "00:45", result: "01:20", link: "https://turkipools.com/" },
-      { nama: "NEWYORKMID", tutup: "01:05", result: "01:45", link: "https://nylottery.ny.gov/draw-game/?game=win4" },
+      { nama: "NEWYORKMID", tutup: "01:05", result: "01:45", link: "https://nylottery.ny.gov/draw-game?game=win4" },
       { nama: "CAROLINADAY", tutup: "01:45", result: "02:00", link: "https://www.lotteryusa.com/north-carolina/midday-pick-4/" },
       { nama: "MAROKO", tutup: "02:30", result: "03:00", link: "https://marokopools.com/" },
       { nama: "OREGON3", tutup: "02:45", result: "03:00", link: "https://www.oregonlottery.org/pick-4/winning-numbers/" },
