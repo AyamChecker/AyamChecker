@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alarm & Jadwal Pasaran - Mascot Side Edition</title>
+  <title>Alarm & Jadwal Pasaran - Vibrate Neon Edition</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -123,34 +123,24 @@
     </div>
   </div>
 
-  <!-- POPUP NOTIFIKASI ALARM DENGAN MASKOT CEWEK DI SAMPING KANAN -->
+  <!-- POPUP NOTIFIKASI ALARM -->
   <div id="alarm-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="flex flex-col sm:flex-row items-center justify-center max-w-2xl w-full modal-vibrate relative">
-      
-      <!-- KOTAK ALARM UTAMA -->
-      <div class="app-card-wrapper max-w-sm w-full relative z-10 shadow-[0_0_30px_rgba(250,204,21,0.3)]">
-        <div class="app-card-inner p-6 text-center space-y-4">
-          <div class="w-12 h-12 bg-yellow-500/20 text-yellow-400 rounded-2xl flex items-center justify-center mx-auto text-xl border border-yellow-400/50">
-            <i class="fa-solid fa-bell"></i>
-          </div>
-          <h3 id="modal-title" class="text-lg font-extrabold text-white uppercase tracking-wider">ALARM PASARAN</h3>
-          <p id="modal-msg" class="text-xs text-yellow-100 leading-relaxed font-mono"></p>
-          <button onclick="closeAlarmModal()" class="w-full py-2.5 bg-yellow-500 hover:bg-yellow-400 text-zinc-950 font-bold text-xs rounded-xl transition shadow-[0_0_15px_rgba(234,179,8,0.5)]">
-            MATIKAN ALARM
-          </button>
+    <div class="app-card-wrapper max-w-sm w-full modal-vibrate">
+      <div class="app-card-inner p-6 text-center space-y-4">
+        <div class="w-12 h-12 bg-yellow-500/20 text-yellow-400 rounded-2xl flex items-center justify-center mx-auto text-xl border border-yellow-400/50">
+          <i class="fa-solid fa-bell"></i>
         </div>
+        <h3 id="modal-title" class="text-lg font-extrabold text-white uppercase tracking-wider">ALARM PASARAN</h3>
+        <p id="modal-msg" class="text-xs text-yellow-100 leading-relaxed font-mono"></p>
+        <button onclick="closeAlarmModal()" class="w-full py-2.5 bg-yellow-500 hover:bg-yellow-400 text-zinc-950 font-bold text-xs rounded-xl transition shadow-[0_0_15px_rgba(234,179,8,0.5)]">
+          MATIKAN ALARM
+        </button>
       </div>
-
-      <!-- GAMBAR CEWEK DI SAMPING KANAN KOTAK ALARM -->
-      <div class="w-56 sm:w-64 -mt-6 sm:mt-0 sm:-ml-6 flex-shrink-0 relative z-20 pointer-events-none drop-shadow-[0_0_20px_rgba(250,204,21,0.4)]">
-        <img src="https://i.ibb.co/L8v8z4R/cewek-megaphone.png" alt="Mascot Alarm" class="w-full h-auto object-contain">
-      </div>
-
     </div>
   </div>
 
   <footer class="max-w-4xl w-full mx-auto text-center text-xs text-yellow-500/60 mt-4">
-    Aplikasi Alarm Pasaran &bull; Mascot Side Edition WIB
+    Aplikasi Alarm Pasaran &bull; Vibrate Neon Edition WIB
   </footer>
 
   <script>
