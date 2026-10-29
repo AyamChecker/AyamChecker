@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jadwal Pasaran & Alarm Result Live Draw</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Jadwal Pasaran & Alarm Result Sirene Polisi</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     * {
@@ -23,7 +23,7 @@
       padding: 25px 15px;
     }
 
-    /* Container dengan efek Animated Neon Border 2 Warna */
+    /* Container dengan efek Animated Neon Border 2 Warna Memutar */
     .neon-card {
       position: relative;
       width: 100%;
@@ -57,7 +57,7 @@
       z-index: -2;
     }
 
-    /* Inset penutup latar belakang dalam */
+    /* Penutup latar belakang dalam */
     .neon-card::after {
       content: '';
       position: absolute;
@@ -187,10 +187,6 @@
       gap: 10px;
     }
 
-    .table-title i {
-      color: #ffd700;
-    }
-
     .search-input {
       background: #14161d;
       border: 1px solid #333745;
@@ -308,13 +304,12 @@
     }
 
     .tr-alert {
-      animation: alertGlow 1s infinite alternate;
-      background: rgba(255, 215, 0, 0.15) !important;
+      animation: alertPolice 0.5s infinite alternate;
     }
 
-    @keyframes alertGlow {
-      from { box-shadow: inset 0 0 10px rgba(0, 243, 255, 0.5); }
-      to { box-shadow: inset 0 0 25px rgba(255, 215, 0, 0.8); }
+    @keyframes alertPolice {
+      0% { background: rgba(255, 0, 55, 0.25) !important; box-shadow: inset 0 0 15px rgba(255, 0, 55, 0.8); }
+      100% { background: rgba(0, 243, 255, 0.25) !important; box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.8); }
     }
 
     .footer-text {
@@ -324,7 +319,7 @@
       margin-top: 10px;
     }
 
-    /* Modal Alarm */
+    /* Modal Alarm Sirene */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -345,13 +340,19 @@
 
     .modal-content {
       background: #12141c;
-      border: 2px solid #00f3ff;
-      box-shadow: 0 0 30px rgba(0, 243, 255, 0.4);
+      border: 3px solid #ff0055;
+      box-shadow: 0 0 35px rgba(255, 0, 85, 0.8);
       border-radius: 16px;
       padding: 30px;
       text-align: center;
-      max-width: 400px;
+      max-width: 420px;
       width: 90%;
+      animation: pulseBorder 0.6s infinite alternate;
+    }
+
+    @keyframes pulseBorder {
+      0% { border-color: #ff0055; box-shadow: 0 0 25px rgba(255, 0, 85, 0.8); }
+      100% { border-color: #00f3ff; box-shadow: 0 0 25px rgba(0, 243, 255, 0.8); }
     }
 
     .modal-title {
@@ -388,7 +389,7 @@
 </head>
 <body>
 
-  <!-- Card Clock Utama dengan Animated Neon Border -->
+  <!-- Container Clock dengan Border Neon 2 Warna -->
   <div class="neon-card">
     <div class="clock-section">
       <div class="clock-title">
@@ -400,18 +401,18 @@
           <span id="audioIcon">🔇</span>
           <span id="audioText">Aktifkan Suara Alarm</span>
         </button>
-        <button class="btn-secondary" onclick="testAlarm()">🔊 Tes Alarm RESULT</button>
+        <button class="btn-secondary" onclick="testAlarm()">🚨 Tes Sirene Polisi</button>
         <button class="btn-secondary" onclick="resetChecklist()">🔄 Reset Status</button>
         <div class="status-badge">Status Alarm: <span id="statusAudioText">Mati</span></div>
       </div>
     </div>
   </div>
 
-  <!-- Card Tabel Utama dengan Animated Neon Border -->
+  <!-- Container Tabel dengan Border Neon 2 Warna -->
   <div class="neon-card">
     <div class="table-header-bar">
       <div class="table-title">
-        <i>📋</i> DAFTAR JADWAL PASARAN & LIVE DRAW
+        <span>📋</span> DAFTAR JADWAL PASARAN & LIVE DRAW
       </div>
       <input type="text" id="searchInput" class="search-input" placeholder="Cari nama pasaran..." onkeyup="filterTable()">
     </div>
@@ -427,27 +428,26 @@
           </tr>
         </thead>
         <tbody id="pasaranTableBody">
-          <!-- Data di-render melalui JavaScript -->
+          <!-- Render via JavaScript -->
         </tbody>
       </table>
     </div>
   </div>
 
   <div class="footer-text">
-    Aplikasi Alarm Pasaran • Dual-Color Neon Animated Edition (WIB)
+    Aplikasi Alarm Pasaran • Police Siren Edition (WIB)
   </div>
 
   <!-- Modal Pop-up Alarm RESULT -->
   <div class="modal-overlay" id="alarmModal">
     <div class="modal-content">
-      <div class="modal-title">🎉 RESULT KELUAR!</div>
+      <div class="modal-title">🚨 RESULT KELUAR!</div>
       <div class="modal-body" id="modalText">Pasaran - telah mengeluarkan RESULT!</div>
-      <button class="btn-modal-stop" onclick="stopAlarm()">MATIKAN ALARM</button>
+      <button class="btn-modal-stop" onclick="stopAlarm()">MATIKAN SIRENE</button>
     </div>
   </div>
 
   <script>
-    // Data 47 Pasaran Lengkap
     const rawData = [
       ["NEWYORK EVE", "09:10WIB", "09:45WIB", "https://nylottery.ny.gov/draw-game?game=win4"],
       ["KENTUCKY EVE", "09:45WIB", "10:05WIB", "https://www.lotteryusa.com/kentucky/pick-4/"],
@@ -501,7 +501,8 @@
     let audioEnabled = false;
     let audioCtx = null;
     let isAlarmRinging = false;
-    let activeOscillators = [];
+    let sirenInterval = null;
+    let currentOscillator = null;
     let completedItems = JSON.parse(localStorage.getItem('completedResultItems')) || {};
     let triggeredTimes = {};
 
@@ -573,54 +574,53 @@
       }
     }
 
-    function playSirenSound() {
+    // Suara Sirene Mobil Polisi Autentik (Police Wail)
+    function playPoliceSiren() {
       if (!audioCtx) return;
       stopAlarm();
       isAlarmRinging = true;
 
-      const osc1 = audioCtx.createOscillator();
-      const osc2 = audioCtx.createOscillator();
+      const osc = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
 
-      osc1.type = 'sawtooth';
-      osc2.type = 'sine';
+      osc.type = 'sawtooth'; // Suara nyaring tajam khas sirene
+      gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
 
-      const now = audioCtx.currentTime;
-      osc1.frequency.setValueAtTime(800, now);
-      osc1.frequency.linearRampToValueAtTime(1400, now + 0.3);
-      osc2.frequency.setValueAtTime(400, now);
-
-      gainNode.gain.setValueAtTime(0.3, now);
-
-      osc1.connect(gainNode);
-      osc2.connect(gainNode);
+      osc.connect(gainNode);
       gainNode.connect(audioCtx.destination);
+      osc.start();
+      currentOscillator = osc;
 
-      osc1.start();
-      osc2.start();
-
-      activeOscillators = [osc1, osc2];
-
-      // Repeat sirene effect
-      this.alarmInterval = setInterval(() => {
+      let highPitch = false;
+      const sweepSiren = () => {
         if (!isAlarmRinging || !audioCtx) return;
-        const t = audioCtx.currentTime;
-        osc1.frequency.cancelScheduledValues(t);
-        osc1.frequency.setValueAtTime(800, t);
-        osc1.frequency.linearRampToValueAtTime(1400, t + 0.3);
-      }, 400);
+        const now = audioCtx.currentTime;
+        osc.frequency.cancelScheduledValues(now);
+
+        if (!highPitch) {
+          // Ramp up ke nada tinggi (Wail Sirene)
+          osc.frequency.setValueAtTime(600, now);
+          osc.frequency.linearRampToValueAtTime(1350, now + 0.45);
+        } else {
+          // Ramp down ke nada rendah
+          osc.frequency.setValueAtTime(1350, now);
+          osc.frequency.linearRampToValueAtTime(600, now + 0.45);
+        }
+        highPitch = !highPitch;
+      };
+
+      sweepSiren();
+      sirenInterval = setInterval(sweepSiren, 480);
     }
 
     function stopAlarm() {
       isAlarmRinging = false;
-      if (this.alarmInterval) clearInterval(this.alarmInterval);
-      activeOscillators.forEach(osc => {
-        try { osc.stop(); } catch(e){}
-      });
-      activeOscillators = [];
+      if (sirenInterval) clearInterval(sirenInterval);
+      if (currentOscillator) {
+        try { currentOscillator.stop(); } catch(e){}
+        currentOscillator = null;
+      }
       document.getElementById('alarmModal').classList.remove('show');
-
-      // Clear highlighted rows
       document.querySelectorAll('.tr-alert').forEach(row => row.classList.remove('tr-alert'));
     }
 
@@ -639,12 +639,12 @@
       const row = document.getElementById(`row-${rowIndex}`);
       if (row) row.classList.add('tr-alert');
 
-      // Play Sound & Show Modal
+      // Play Police Siren Sound
       if (audioEnabled) {
-        playSirenSound();
+        playPoliceSiren();
       }
 
-      document.getElementById('modalText').textContent = `Pasaran ${namaPasaran} telah memasuki JAM RESULT!`;
+      document.getElementById('modalText').textContent = `Pasaran ${namaPasaran} telah mengeluarkan RESULT!`;
       document.getElementById('alarmModal').classList.add('show');
     }
 
@@ -657,12 +657,12 @@
       document.getElementById('clock').textContent = `${hours} : ${minutes} : ${seconds}`;
       const currentTimeStr = `${hours}:${minutes}`;
 
-      // Reset triggered buffer at 00:00:00
+      // Reset buffer jam 00:00:00
       if (hours === '00' && minutes === '00' && seconds === '00') {
         triggeredTimes = {};
       }
 
-      // Check RESULT Alarm match (only at second '00')
+      // Cek Alarm saat detik 00 pada Jam RESULT
       if (seconds === '00') {
         rawData.forEach((item, index) => {
           const [nama, tutup, resultStr] = item;
