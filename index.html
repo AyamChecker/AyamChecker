@@ -393,7 +393,7 @@
           <span id="audioIcon">🔇</span>
           <span id="audioText">Aktifkan Suara Alarm</span>
         </button>
-        <button class="btn-secondary" onclick="testAlarm()"> Tes Suara Alaram</button>
+        <button class="btn-secondary" onclick="testAlarm()">Tes Suara Alaram</button>
         <button class="btn-secondary" onclick="resetChecklist()">🔄 Reset Status</button>
         <div class="status-badge">Status Alarm: <span id="statusAudioText">Mati</span></div>
       </div>
@@ -404,7 +404,7 @@
   <div class="neon-card">
     <div class="table-header-bar">
       <div class="table-title">
-        <span>📋</span> DAFTAR JADWAL PASARAN & LIVE DRAW
+        <span></span> DAFTAR JADWAL PASARAN & LIVE DRAW
       </div>
       <input type="text" id="searchInput" class="search-input" placeholder="Cari nama pasaran..." onkeyup="filterTable()">
     </div>
@@ -496,11 +496,15 @@
     let sirenInterval = null;
     let currentOscillator = null;
     let completedItems = JSON.parse(localStorage.getItem('completedResultItems')) || {};
-    let triggeredToday = {};
 
-    // Fungsi pembantu pembersih format jam "09:45WIB" / "09.45WIB" -> "09:45"
     function formatTime(str) {
       return str.replace('WIB', '').replace('.', ':').trim();
+    }
+
+    // Ubah format "HH:MM" ke total menit dari awal hari agar mudah dibandingkan secara matematis
+    function timeToMinutes(timeStr) {
+      const [h, m] = timeStr.split(':').map(Number);
+      return h * 60 + m;
     }
 
     function initTable() {
@@ -573,7 +577,6 @@
     function resetChecklist() {
       if (confirm("Reset semua status pasaran kembali ke AKTIF?")) {
         completedItems = {};
-        triggeredToday = {};
         localStorage.removeItem('completedResultItems');
         initTable();
       }
@@ -644,16 +647,13 @@
       document.querySelectorAll('.tr-alert').forEach(row => row.classList.remove('tr-alert'));
     }
 
-    function triggerAlarmForResult(namaPasaran, rowIndex) {
-      // 1. Eksekusi checklist otomatis
+    function triggerAlarmForResult(namaPasaran, rowIndex, playSound = true) {
       setStatusSelesai(namaPasaran, rowIndex);
 
-      // 2. Bunyikan sirene jika aktif
-      if (audioEnabled) {
+      if (playSound && audioEnabled) {
         playPoliceSiren();
       }
 
-      // 3. Tampilkan Pop-up
       document.getElementById('modalText').textContent = `Pasaran ${namaPasaran} telah mengeluarkan RESULT!`;
       document.getElementById('alarmModal').classList.add('show');
     }
@@ -666,21 +666,30 @@
 
       document.getElementById('clock').textContent = `${hours} : ${minutes} : ${seconds}`;
       const currentTimeStr = `${hours}:${minutes}`;
+      const currentTotalMinutes = timeToMinutes(currentTimeStr);
 
-      // Reset pemicu otomatis harian saat pergantian hari (00:00:00)
+      // Reset otomatis ketika jam 00:00:00 (pergantian hari)
       if (hours === '00' && minutes === '00' && seconds === '00') {
-        triggeredToday = {};
+        completedItems = {};
+        localStorage.removeItem('completedResultItems');
+        initTable();
       }
 
       // Cek pencocokan Jam RESULT
       rawData.forEach((item, index) => {
         const [nama, tutup, resultStr] = item;
         const cleanResult = formatTime(resultStr);
+        const resultTotalMinutes = timeToMinutes(cleanResult);
 
-        // Jika Jam WIB cocok dan belum pernah terpicu untuk jam tersebut
-        if (cleanResult === currentTimeStr && !triggeredToday[`${nama}-${cleanResult}`]) {
-          triggeredToday[`${nama}-${cleanResult}`] = true;
-          triggerAlarmForResult(nama, index);
+        // Jika waktu sekarang sudah melewati atau pas jam result, dan status belum selesai
+        if (currentTotalMinutes >= resultTotalMinutes && !completedItems[nama]) {
+          // Beri toleransi waktu tertinggal dalam rentang 15 menit agar tidak alarm susulan untuk hari kemarin
+          if (currentTotalMinutes - resultTotalMinutes <= 15) {
+            triggerAlarmForResult(nama, index, true);
+          } else {
+            // Jika sudah terlewat jauh (misal tertinggal berjam-jam saat HP mati), otomatiskan checklist tanpa bunyi alarm panjang agar tidak mengagetkan
+            setStatusSelesai(nama, index);
+          }
         }
       });
     }
@@ -689,7 +698,7 @@
       if (!audioEnabled) {
         toggleAudio();
       }
-      triggerAlarmForResult(rawData[0][0], 0);
+      triggerAlarmForResult(rawData[0][0], 0, true);
     }
 
     function filterTable() {
@@ -704,8 +713,15 @@
 
     // Inisialisasi
     initTable();
-    setInterval(updateClockAndCheckAlarm, 500); // Pengecekan tiap 0.5 detik agar akurat
+    setInterval(updateClockAndCheckAlarm, 1000);
     updateClockAndCheckAlarm();
+
+    // Fitur Catch-Up: Periksa ulang otomatis begitu tab kembali aktif atau dibuka dari background HP
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        updateClockAndCheckAlarm();
+      }
+    });
   </script>
 </body>
 </html>
