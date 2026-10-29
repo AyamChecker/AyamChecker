@@ -1,479 +1,702 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Alarm Pasaran • Vibrate Neon Edition WIB</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts for Digital Clock & Typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700;800&family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background-color: #070709;
-            color: #ffffff;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            min-height: 100vh;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jadwal Pasaran & Alarm Result Live Draw</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        .font-clock {
-            font-family: 'Orbitron', monospace;
-        }
+    body {
+      background-color: #08080a;
+      color: #f0f0f0;
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 25px 15px;
+    }
 
-        .font-pasaran {
-            font-family: 'Chakra Petch', sans-serif;
-        }
+    /* Container dengan efek Animated Neon Border 2 Warna */
+    .neon-card {
+      position: relative;
+      width: 100%;
+      max-width: 950px;
+      background: #0d0e12;
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 25px;
+      overflow: hidden;
+      z-index: 1;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    }
 
-        /* Glowing Effects */
-        .clock-glow {
-            text-shadow: 0 0 20px rgba(250, 204, 21, 0.4), 0 0 40px rgba(250, 204, 21, 0.2);
-        }
+    /* Lapisan animasi border neon berputar */
+    .neon-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg 90deg,
+        #ffd700 120deg,
+        transparent 150deg 240deg,
+        #00f3ff 270deg,
+        transparent 300deg
+      );
+      animation: rotateNeon 4s linear infinite;
+      z-index: -2;
+    }
 
-        .border-neon {
-            border-color: rgba(234, 179, 8, 0.35);
-            box-shadow: 0 0 15px rgba(234, 179, 8, 0.08);
-        }
+    /* Inset penutup latar belakang dalam */
+    .neon-card::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      background: #0d0e12;
+      border-radius: 17px;
+      z-index: -1;
+    }
 
-        .border-neon:hover {
-            border-color: rgba(234, 179, 8, 0.6);
-        }
+    @keyframes rotateNeon {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0d0d12;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #27272a;
-            border-radius: 999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #eab308;
-        }
+    /* Section Jam */
+    .clock-section {
+      text-align: center;
+      padding: 10px 0;
+    }
 
-        /* Custom Table Styling */
-        .table-row-item {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: background-color 0.2s ease;
-        }
-        .table-row-item:hover {
-            background-color: rgba(234, 179, 8, 0.04);
-        }
-        .table-row-item.checked-row {
-            background-color: rgba(34, 197, 94, 0.06);
-        }
+    .clock-title {
+      color: #ffd700;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
 
-        /* Pulsing Alarm Button */
-        @keyframes pulse-red {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            50% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-        }
-        .animate-pulse-red {
-            animation: pulse-red 1.5s infinite;
-        }
-    </style>
+    .digital-clock {
+      font-family: 'Orbitron', monospace;
+      font-size: 3.8rem;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.2);
+      letter-spacing: 4px;
+      margin: 10px 0 18px 0;
+    }
+
+    /* Controls */
+    .controls-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .btn-alarm-toggle {
+      background: linear-gradient(135deg, #d32f2f, #9a0007);
+      color: #ffffff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(211, 47, 47, 0.5);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-alarm-toggle.active {
+      background: linear-gradient(135deg, #2e7d32, #1b5e20);
+      box-shadow: 0 0 15px rgba(46, 125, 50, 0.5);
+    }
+
+    .btn-alarm-toggle:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.2);
+    }
+
+    .btn-secondary {
+      background: #1e2029;
+      color: #ffd700;
+      border: 1px solid #ffd700;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #ffd700;
+      color: #000;
+    }
+
+    .status-badge {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #aaa;
+    }
+
+    .status-badge span {
+      color: #00f3ff;
+      text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+    }
+
+    /* Header Table Section */
+    .table-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .table-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .table-title i {
+      color: #ffd700;
+    }
+
+    .search-input {
+      background: #14161d;
+      border: 1px solid #333745;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      width: 220px;
+      transition: border 0.3s;
+    }
+
+    .search-input:focus {
+      border-color: #ffd700;
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+    }
+
+    /* Table Styling */
+    .table-container {
+      overflow-x: auto;
+      max-height: 550px;
+      overflow-y: auto;
+    }
+
+    .table-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+      background: #ffd700;
+      border-radius: 3px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+      background: #111217;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #12141c;
+      color: #ffd700;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      padding: 12px 16px;
+      border-bottom: 2px solid #252836;
+      z-index: 10;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #1a1c26;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background: rgba(255, 215, 0, 0.03);
+    }
+
+    .pasaran-link {
+      color: #ffd700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .pasaran-link:hover {
+      color: #00f3ff;
+      text-shadow: 0 0 8px rgba(0, 243, 255, 0.5);
+    }
+
+    .time-tutup {
+      color: #ffd700;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.9rem;
+    }
+
+    .time-result {
+      color: #00f3ff;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.9rem;
+      text-shadow: 0 0 5px rgba(0, 243, 255, 0.3);
+    }
+
+    /* Status Badge in Table */
+    .btn-status {
+      padding: 5px 14px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: 'Orbitron', sans-serif;
+      cursor: pointer;
+      border: 1px solid #3a3f54;
+      background: #1e212d;
+      color: #888;
+      transition: all 0.3s ease;
+    }
+
+    .btn-status.done {
+      background: rgba(0, 255, 136, 0.15);
+      border-color: #00ff88;
+      color: #00ff88;
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+    }
+
+    .tr-alert {
+      animation: alertGlow 1s infinite alternate;
+      background: rgba(255, 215, 0, 0.15) !important;
+    }
+
+    @keyframes alertGlow {
+      from { box-shadow: inset 0 0 10px rgba(0, 243, 255, 0.5); }
+      to { box-shadow: inset 0 0 25px rgba(255, 215, 0, 0.8); }
+    }
+
+    .footer-text {
+      text-align: center;
+      color: #666;
+      font-size: 0.8rem;
+      margin-top: 10px;
+    }
+
+    /* Modal Alarm */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: #12141c;
+      border: 2px solid #00f3ff;
+      box-shadow: 0 0 30px rgba(0, 243, 255, 0.4);
+      border-radius: 16px;
+      padding: 30px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .modal-title {
+      color: #ffd700;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+    }
+
+    .modal-body {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    .btn-modal-stop {
+      background: linear-gradient(135deg, #ff0055, #990033);
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 25px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(255, 0, 85, 0.6);
+    }
+
+    @media (max-width: 600px) {
+      .digital-clock { font-size: 2.5rem; }
+      .search-input { width: 100%; }
+    }
+  </style>
 </head>
-<body class="p-3 sm:p-6 lg:p-8 flex flex-col justify-between items-center">
+<body>
 
-    <div class="w-full max-w-5xl mx-auto space-y-6">
+  <!-- Card Clock Utama dengan Animated Neon Border -->
+  <div class="neon-card">
+    <div class="clock-section">
+      <div class="clock-title">
+        <span>⏰</span> WAKTU REALTIME (WIB)
+      </div>
+      <div class="digital-clock" id="clock">00 : 00 : 00</div>
+      <div class="controls-wrapper">
+        <button class="btn-alarm-toggle" id="btnAudioToggle" onclick="toggleAudio()">
+          <span id="audioIcon">🔇</span>
+          <span id="audioText">Aktifkan Suara Alarm</span>
+        </button>
+        <button class="btn-secondary" onclick="testAlarm()">🔊 Tes Alarm RESULT</button>
+        <button class="btn-secondary" onclick="resetChecklist()">🔄 Reset Status</button>
+        <div class="status-badge">Status Alarm: <span id="statusAudioText">Mati</span></div>
+      </div>
+    </div>
+  </div>
 
-        <!-- TOP CLOCK BLOCK (Exact Match to Image 2) -->
-        <div class="bg-[#0b0b0f] border border-yellow-500/30 rounded-2xl p-6 text-center border-neon relative overflow-hidden">
-            <!-- Header Label -->
-            <div class="flex items-center justify-center gap-2 text-yellow-400 font-bold tracking-wider text-xs sm:text-sm uppercase mb-2">
-                <i class="fa-regular fa-clock text-yellow-400 text-sm"></i>
-                <span>WAKTU REALTIME (WIB)</span>
-            </div>
-
-            <!-- Big Digital Clock -->
-            <div id="digitalClock" class="font-clock text-4xl sm:text-6xl md:text-7xl font-black tracking-widest text-white clock-glow py-2">
-                00 : 00 : 00
-            </div>
-
-            <!-- Audio Control Bar -->
-            <div class="flex flex-wrap items-center justify-center gap-3 mt-4">
-                <button id="toggleAudioBtn" onclick="toggleAudio()" class="bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs sm:text-sm py-2 px-5 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg cursor-pointer">
-                    <i id="audioIcon" class="fa-solid fa-volume-xmark"></i>
-                    <span id="audioBtnText">Matikan Suara Alarm</span>
-                </button>
-                <div class="text-xs sm:text-sm font-semibold text-gray-300">
-                    Status Suara: <span id="audioStatusText" class="text-yellow-400 font-bold">Aktif</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- MAIN TABLE CONTAINER BLOCK (Exact Match to Image 2) -->
-        <div class="bg-[#0b0b0f] border border-yellow-500/30 rounded-2xl p-4 sm:p-6 border-neon">
-            
-            <!-- Table Header Bar -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6">
-                <!-- Title -->
-                <div class="flex items-center gap-2 text-white font-extrabold text-sm sm:text-base tracking-wide uppercase">
-                    <i class="fa-solid fa-list-ul text-yellow-400"></i>
-                    <span>DAFTAR JADWAL PASARAN & LIVE DRAW</span>
-                </div>
-
-                <!-- Search Bar -->
-                <div class="relative w-full sm:w-72">
-                    <input type="text" id="searchInput" onkeyup="filterPasaran()" placeholder="Cari nama pasaran..." class="w-full bg-[#121218] text-gray-200 text-xs sm:text-sm rounded-full pl-4 pr-9 py-2 border border-gray-800 focus:border-yellow-500 focus:outline-none transition">
-                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-2.5 text-gray-500 text-xs"></i>
-                </div>
-            </div>
-
-            <!-- Pasaran Table -->
-            <div class="overflow-x-auto max-h-[620px] overflow-y-auto pr-1">
-                <table class="w-full text-left border-collapse" id="pasaranTable">
-                    <thead>
-                        <tr class="text-[11px] sm:text-xs font-bold text-yellow-500 uppercase border-b border-gray-800 tracking-wider">
-                            <th class="pb-3 px-3">PASARAN (KLIK UNTUK LIVE DRAW)</th>
-                            <th class="pb-3 px-3 text-center">TUTUP</th>
-                            <th class="pb-3 px-3 text-center">RESULT</th>
-                            <th class="pb-3 px-3 text-center">STATUS</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody" class="divide-y divide-gray-800/60 font-pasaran text-xs sm:text-sm">
-                        <!-- Dynamic Rows Injected by JS -->
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Quick Action Footer Inside Card -->
-            <div class="mt-4 pt-3 border-t border-gray-900 flex justify-between items-center text-xs text-gray-500">
-                <button onclick="testAlarmSound()" class="hover:text-yellow-400 transition flex items-center gap-1">
-                    <i class="fa-solid fa-bell"></i> Tes Suara Alarm
-                </button>
-                <button onclick="resetAllStatus()" class="hover:text-red-400 transition flex items-center gap-1">
-                    <i class="fa-solid fa-rotate-left"></i> Reset Status
-                </button>
-            </div>
-        </div>
-
-        <!-- FOOTER BRANDING -->
-        <div class="text-center text-xs text-yellow-500/70 font-semibold tracking-wider pb-4">
-            Aplikasi Alarm Pasaran • Vibrate Neon Edition WIB
-        </div>
+  <!-- Card Tabel Utama dengan Animated Neon Border -->
+  <div class="neon-card">
+    <div class="table-header-bar">
+      <div class="table-title">
+        <i>📋</i> DAFTAR JADWAL PASARAN & LIVE DRAW
+      </div>
+      <input type="text" id="searchInput" class="search-input" placeholder="Cari nama pasaran..." onkeyup="filterTable()">
     </div>
 
-    <!-- ALARM MODAL POPUP -->
-    <div id="alarmModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-[#12121a] border-2 border-red-500 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl animate-pulse-red">
-            <div class="text-4xl text-yellow-400 mb-2">
-                <i class="fa-solid fa-bell animate-bounce"></i>
-            </div>
-            <h3 class="text-xl font-extrabold text-white uppercase tracking-wider mb-1">ALARM PASARAN!</h3>
-            <p id="modalPasaranName" class="text-lg font-bold text-yellow-400 mb-1">NEWYORK EVE</p>
-            <p id="modalPasaranTime" class="text-xs text-gray-300 mb-6">WAKTU RESULT: 09:45 WIB</p>
-            
-            <button onclick="stopCurrentAlarm()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-2.5 px-4 rounded-xl text-sm uppercase tracking-wider shadow-lg transition">
-                TUTUP ALARM
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>PASARAN (KLIK UNTUK LIVE DRAW)</th>
+            <th>TUTUP</th>
+            <th>RESULT</th>
+            <th>STATUS</th>
+          </tr>
+        </thead>
+        <tbody id="pasaranTableBody">
+          <!-- Data di-render melalui JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer-text">
+    Aplikasi Alarm Pasaran • Dual-Color Neon Animated Edition (WIB)
+  </div>
+
+  <!-- Modal Pop-up Alarm RESULT -->
+  <div class="modal-overlay" id="alarmModal">
+    <div class="modal-content">
+      <div class="modal-title">🎉 RESULT KELUAR!</div>
+      <div class="modal-body" id="modalText">Pasaran - telah mengeluarkan RESULT!</div>
+      <button class="btn-modal-stop" onclick="stopAlarm()">MATIKAN ALARM</button>
+    </div>
+  </div>
+
+  <script>
+    // Data 47 Pasaran Lengkap
+    const rawData = [
+      ["NEWYORK EVE", "09:10WIB", "09:45WIB", "https://nylottery.ny.gov/draw-game?game=win4"],
+      ["KENTUCKY EVE", "09:45WIB", "10:05WIB", "https://www.lotteryusa.com/kentucky/pick-4/"],
+      ["CAROLINA EVE", "10:10WIB", "10:22WIB", "https://www.wral.com/evening-pick-3-pick-4-and-cash-5/1075494/"],
+      ["TASMANIA 10", "10:30WIB", "11:00WIB", "http://www.tasmanialottery.com/"],
+      ["CAMBODIA", "11:20WIB", "11:50WIB", "https://www.magnumcambodia.com/"],
+      ["OREGON12", "11:45WIB", "12:00WIB", "https://www.oregonlottery.org/pick-4/winning-numbers/"],
+      ["BULLSEYE", "11:45WIB", "12:30WIB", "https://mylotto.co.nz/results/bullseye"],
+      ["FUJIAN 12", "12:00WIB", "12:30WIB", "http://www.fujianlottery.com/"],
+      ["TASMANIA 13", "12:30WIB", "13:00WIB", "http://www.tasmanialottery.com/"],
+      ["TOTOMACAU13", "13:00WIB", "13:10WIB", "https://www.totomacaupools.club/result.php"],
+      ["SYDNEY", "13:49WIB", "13:50WIB", "https://sydneylotto.com/"],
+      ["LIBANON", "14:30WIB", "15:00WIB", "https://libanonpools.com/pool/draw"],
+      ["TOTOMACAU5D15", "15:15WIB", "15:25WIB", "https://www.totomacaupools.club/result.php"],
+      ["CHINA", "15:00WIB", "15:30WIB", "https://www.chinapools.asia/"],
+      ["FUJIAN 15", "15:15WIB", "15:45WIB", "http://www.fujianlottery.com/"],
+      ["TOTOMACAU16", "16:00WIB", "16:10WIB", "https://www.totomacaupools.club/result.php"],
+      ["TASMANIA 16", "16:00WIB", "16:30WIB", "http://www.tasmanialottery.com"],
+      ["KINGKONG17", "17:00WIB", "17:05WIB", "https://kingkongpools.com/results"],
+      ["JAPAN", "16:50WIB", "17:20WIB", "https://japanpools.online/"],
+      ["SINGAPORE", "17:25WIB", "17:45WIB", "https://www.singaporepools.com.sg/en/product/Pages/4d_results.aspx"],
+      ["KAMBOJA", "18:15WIB", "18:30WIB", "https://kambojapools.com/pool/draw"],
+      ["TOTOMACAU19", "19:00WIB", "19:10WIB", "https://www.totomacaupools.club/result.php"],
+      ["FUJIAN 20", "19:30WIB", "20:00WIB", "http://www.fujianlottery.com/"],
+      ["PCSO", "19:50WIB", "20:10WIB", "https://www.pcso.gov.ph/SearchLottoResult.aspx"],
+      ["TAIWAN", "20:15WIB", "20:45WIB", "https://taiwan-lotto.com/"],
+      ["YORDANIA4D", "20:30WIB", "21:00WIB", "https://www.yordania4d.com/pool/draw"],
+      ["TOTOMACAU5D21", "21:25WIB", "21:25WIB", "https://kick.com/search?query=studio-live-game"],
+      ["CHICAGODAY", "21:00WIB", "21:30WIB", "https://www.chicagolottery.world/"],
+      ["TOTOMACAU22", "22:00WIB", "22:10WIB", "https://www.totomacaupools.club/result.php"],
+      ["TOTOMACAU23", "23:00WIB", "23:10WIB", "https://www.totomacaupools.club/result.php"],
+      ["HONGKONG", "22:59WIB", "23:00WIB", "https://kick.com/search?query=hongkong-lotto-official"],
+      ["JAKARTA", "22:30WIB", "23:30WIB", "https://jakartapools.com/"],
+      ["KINGKONG23", "23:30WIB", "23:35WIB", "https://kingkongpools.com/results"],
+      ["FUJIAN23", "23:15WIB", "23:45WIB", "http://www.fujianlottery.com/"],
+      ["TOTOMACAU00", "00:01WIB", "00:10WIB", "https://www.totomacaupools.club/result.php"],
+      ["KENTUCKYMID", "00:05WIB", "00:30WIB", "https://www.lotteryusa.com/kentucky/midday-pick-4/"],
+      ["FLORIDAMID", "00:15WIB", "00:40WIB", "https://www.lotteryusa.com/florida/midday-pick-4/"],
+      ["TURKI", "00:45WIB", "01:20WIB", "https://turkipools.com/"],
+      ["NEWYORKMID", "01:05WIB", "01:45WIB", "https://nylottery.ny.gov/draw-game/?game=win4"],
+      ["CAROLINADAY", "01:45WIB", "02:00WIB", "https://www.lotteryusa.com/north-carolina/midday-pick-4/"],
+      ["MAROKO", "02:30WIB", "03:00WIB", "https://marokopools.com/"],
+      ["OREGON3", "02:45WIB", "03:00WIB", "https://www.oregonlottery.org/pick-4/winning-numbers/"],
+      ["OREGON6", "05:45WIB", "06:00WIB", "https://www.oregonlottery.org/pick-4/winning-numbers/"],
+      ["TASMANIA06", "06:30WIB", "07:00WIB", "http://www.tasmanialottery.com/"],
+      ["CHICAGONIGHT", "07:30WIB", "08:00WIB", "https://www.chicagolottery.world/"],
+      ["FLORIDAEVE", "08:35WIB", "08:55WIB", "https://www.lotteryusa.com/florida/pick-4/"],
+      ["OREGON9", "08:45WIB", "09:00WIB", "https://www.oregonlottery.org/pick-4/winning-numbers/"]
+    ];
+
+    let audioEnabled = false;
+    let audioCtx = null;
+    let isAlarmRinging = false;
+    let activeOscillators = [];
+    let completedItems = JSON.parse(localStorage.getItem('completedResultItems')) || {};
+    let triggeredTimes = {};
+
+    function initTable() {
+      const tbody = document.getElementById('pasaranTableBody');
+      tbody.innerHTML = '';
+      
+      rawData.forEach((item, index) => {
+        const [nama, tutup, result, link] = item;
+        const isDone = completedItems[nama] || false;
+
+        const tr = document.createElement('tr');
+        tr.id = `row-${index}`;
+        tr.innerHTML = `
+          <td>
+            <a href="${link}" target="_blank" class="pasaran-link">
+              ↗ ${nama}
+            </a>
+          </td>
+          <td class="time-tutup">${tutup.replace('.', ':')}</td>
+          <td class="time-result">${result.replace('.', ':')}</td>
+          <td>
+            <button class="btn-status ${isDone ? 'done' : ''}" id="status-btn-${index}" onclick="toggleStatus(${index}, '${nama}')">
+              ${isDone ? '✓ SELESAI' : 'AKTIF'}
             </button>
-        </div>
-    </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
 
-    <script>
-        // Full Data Set (47 Pasaran)
-        const pasaranData = [
-            { id: 1, name: "NEWYORK EVE", tutup: "09:10 WIB", result: "09:45 WIB", url: "https://nylottery.ny.gov/draw-game?game=win4" },
-            { id: 2, name: "KENTUCKY EVE", tutup: "09:45 WIB", result: "10:05 WIB", url: "https://www.lotteryusa.com/kentucky/pick-4/" },
-            { id: 3, name: "CAROLINA EVE", tutup: "10:10 WIB", result: "10:22 WIB", url: "https://www.wral.com/evening-pick-3-pick-4-and-cash-5/1075494/" },
-            { id: 4, name: "TASMANIA 10", tutup: "10:30 WIB", result: "11:00 WIB", url: "http://www.tasmanialottery.com/" },
-            { id: 5, name: "CAMBODIA", tutup: "11:20 WIB", result: "11:50 WIB", url: "https://www.magnumcambodia.com/" },
-            { id: 6, name: "OREGON12", tutup: "11:45 WIB", result: "12:00 WIB", url: "https://www.oregonlottery.org/pick-4/winning-numbers/" },
-            { id: 7, name: "BULLSEYE", tutup: "11:45 WIB", result: "12:30 WIB", url: "https://mylotto.co.nz/results/bullseye" },
-            { id: 8, name: "FUJIAN 12", tutup: "12:00 WIB", result: "12:30 WIB", url: "http://www.fujianlottery.com/" },
-            { id: 9, name: "TASMANIA 13", tutup: "12:30 WIB", result: "13:00 WIB", url: "http://www.tasmanialottery.com/" },
-            { id: 10, name: "TOTOMACAU13", tutup: "13:00 WIB", result: "13:10 WIB", url: "https://www.totomacaupools.club/result.php" },
-            { id: 11, name: "SYDNEY", tutup: "13:49 WIB", result: "13:50 WIB", url: "https://sydneylotto.com/" },
-            { id: 12, name: "LIBANON", tutup: "14:30 WIB", result: "15:00 WIB", url: "https://libanonpools.com/pool/draw" },
-            { id: 13, name: "TOTOMACAU5D15", tutup: "15:15 WIB", result: "15:25 WIB", url: "https://www.totomacaupools.club/result.php" },
-            { id: 14, name: "CHINA", tutup: "15:00 WIB", result: "15:30 WIB", url: "https://www.chinapools.asia/" },
-            { id: 15, name: "FUJIAN 15", tutup: "15:15 WIB", result: "15:45 WIB", url: "http://www.fujianlottery.com/" },
-            { id: 16, name: "TOTOMACAU16", tutup: "16:00 WIB", result: "16:10 WIB", url: "https://www.totomacaupools.club/result.php" },
-            { id: 17, name: "TASMANIA 16", tutup: "16:00 WIB", result: "16:30 WIB", url: "http://www.tasmanialottery.com" },
-            { id: 18, name: "KINGKONG17", tutup: "17:00 WIB", result: "17:05 WIB", url: "https://kingkongpools.com/results" },
-            { id: 19, name: "JAPAN", tutup: "16:50 WIB", result: "17:20 WIB", url: "https://japanpools.online/" },
-            { id: 20, name: "SINGAPORE", tutup: "17:25 WIB", result: "17:45 WIB", url: "https://www.singaporepools.com.sg/en/product/Pages/4d_results.aspx" },
-            { id: 21, name: "KAMBOJA", tutup: "18:15 WIB", result: "18:30 WIB", url: "https://kambojapools.com/pool/draw" },
-            { id: 22, name: "TOTOMACAU19", tutup: "19:00 WIB", result: "19:10 WIB", url: "https://www.totomacaupools.club/result.php" },
-            { id: 23, name: "FUJIAN 20", tutup: "19:30 WIB", result: "20:00 WIB", url: "http://www.fujianlottery.com/" },
-            { id: 24, name: "PCSO", tutup: "19:50 WIB", result: "20:10 WIB", url: "https://www.pcso.gov.ph/SearchLottoResult.aspx" },
-            { id: 25, name: "TAIWAN", tutup: "20:15 WIB", result: "20:45 WIB", url: "https://taiwan-lotto.com/" },
-            { id: 26, name: "YORDANIA4D", tutup: "20:30 WIB", result: "21:00 WIB", url: "https://www.yordania4d.com/pool/draw" },
-            { id: 27, name: "TOTOMACAU5D21", tutup: "21:25 WIB", result: "21:25 WIB", url: "https://kick.com/search?query=studio-live-game" },
-            { id: 28, name: "CHICAGODAY", tutup: "21:00 WIB", result: "21:30 WIB", url: "https://www.chicagolottery.world/" },
-            { id: 29, name: "TOTOMACAU22", tutup: "22:00 WIB", result: "22:10 WIB", url: "https://www.totomacaupools.club/result.php" },
-            { id: 30, name: "TOTOMACAU23", tutup: "23:00 WIB", result: "23:10 WIB", url: "https://www.totomacaupools.club/result.php" },
-            { id: 31, name: "HONGKONG", tutup: "22:59 WIB", result: "23:00 WIB", url: "https://kick.com/search?query=hongkong-lotto-official" },
-            { id: 32, name: "JAKARTA", tutup: "22:30 WIB", result: "23:30 WIB", url: "https://jakartapools.com/" },
-            { id: 33, name: "KINGKONG23", tutup: "23:30 WIB", result: "23:35 WIB", url: "https://kingkongpools.com/results" },
-            { id: 34, name: "FUJIAN23", tutup: "23:15 WIB", result: "23:45 WIB", url: "http://www.fujianlottery.com/" },
-            { id: 35, name: "TOTOMACAU00", tutup: "00:01 WIB", result: "00:10 WIB", url: "https://www.totomacaupools.club/result.php" },
-            { id: 36, name: "KENTUCKYMID", tutup: "00:05 WIB", result: "00:30 WIB", url: "https://www.lotteryusa.com/kentucky/midday-pick-4/" },
-            { id: 37, name: "FLORIDAMID", tutup: "00:15 WIB", result: "00:40 WIB", url: "https://www.lotteryusa.com/florida/midday-pick-4/" },
-            { id: 38, name: "TURKI", tutup: "00:45 WIB", result: "01:20 WIB", url: "https://turkipools.com/" },
-            { id: 39, name: "NEWYORKMID", tutup: "01:05 WIB", result: "01:45 WIB", url: "https://nylottery.ny.gov/draw-game/?game=win4" },
-            { id: 40, name: "CAROLINADAY", tutup: "01:45 WIB", result: "02:00 WIB", url: "https://www.lotteryusa.com/north-carolina/midday-pick-4/" },
-            { id: 41, name: "MAROKO", tutup: "02:30 WIB", result: "03:00 WIB", url: "https://marokopools.com/" },
-            { id: 42, name: "OREGON3", tutup: "02:45 WIB", result: "03:00 WIB", url: "https://www.oregonlottery.org/pick-4/winning-numbers/" },
-            { id: 43, name: "OREGON6", tutup: "05:45 WIB", result: "06:00 WIB", url: "https://www.oregonlottery.org/pick-4/winning-numbers/" },
-            { id: 44, name: "TASMANIA06", tutup: "06:30 WIB", result: "07:00 WIB", url: "http://www.tasmanialottery.com/" },
-            { id: 45, name: "CHICAGONIGHT", tutup: "07:30 WIB", result: "08:00 WIB", url: "https://www.chicagolottery.world/" },
-            { id: 46, name: "FLORIDAEVE", tutup: "08:35 WIB", result: "08:55 WIB", url: "https://www.lotteryusa.com/florida/pick-4/" },
-            { id: 47, name: "OREGON9", tutup: "08:45 WIB", result: "09:00 WIB", url: "https://www.oregonlottery.org/pick-4/winning-numbers/" }
-        ];
+    function toggleStatus(index, nama) {
+      completedItems[nama] = !completedItems[nama];
+      localStorage.setItem('completedResultItems', JSON.stringify(completedItems));
+      
+      const btn = document.getElementById(`status-btn-${index}`);
+      if (completedItems[nama]) {
+        btn.classList.add('done');
+        btn.textContent = '✓ SELESAI';
+      } else {
+        btn.classList.remove('done');
+        btn.textContent = 'AKTIF';
+      }
+    }
 
-        // Status state saved in localStorage
-        let statusState = JSON.parse(localStorage.getItem('pasaran_status_state')) || {};
-        let isAudioActive = true;
-        let audioCtx = null;
-        let alarmInterval = null;
-        let triggeredKeys = new Set();
+    function resetChecklist() {
+      if (confirm("Reset semua status pasaran kembali ke AKTIF?")) {
+        completedItems = {};
+        localStorage.removeItem('completedResultItems');
+        initTable();
+      }
+    }
 
-        window.onload = function() {
-            renderTable();
-            startClockAndAlarm();
-        };
+    function toggleAudio() {
+      if (!audioEnabled) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        audioEnabled = true;
+        document.getElementById('btnAudioToggle').classList.add('active');
+        document.getElementById('audioIcon').textContent = '🔔';
+        document.getElementById('audioText').textContent = 'Suara Alarm Aktif';
+        document.getElementById('statusAudioText').textContent = 'Aktif';
+      } else {
+        audioEnabled = false;
+        document.getElementById('btnAudioToggle').classList.remove('active');
+        document.getElementById('audioIcon').textContent = '🔇';
+        document.getElementById('audioText').textContent = 'Aktifkan Suara Alarm';
+        document.getElementById('statusAudioText').textContent = 'Mati';
+        stopAlarm();
+      }
+    }
 
-        // Render Table Rows
-        function renderTable() {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
+    function playSirenSound() {
+      if (!audioCtx) return;
+      stopAlarm();
+      isAlarmRinging = true;
 
-            pasaranData.forEach(item => {
-                const isChecked = !!statusState[item.id];
-                const tr = document.createElement('tr');
-                tr.className = `table-row-item ${isChecked ? 'checked-row' : ''}`;
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
 
-                tr.innerHTML = `
-                    <td class="py-3 px-3 font-bold text-yellow-400 hover:underline">
-                        <a href="${item.url}" target="_blank" rel="noopener text-yellow-400 flex items-center gap-1.5">
-                            <i class="fa-solid fa-arrow-up-right-from-square text-[11px] text-yellow-500"></i>
-                            <span>${escapeHtml(item.name)}</span>
-                        </a>
-                    </td>
-                    <td class="py-3 px-3 text-center font-bold text-yellow-400/90">${item.tutup}</td>
-                    <td class="py-3 px-3 text-center font-bold text-emerald-400">${item.result}</td>
-                    <td class="py-3 px-3 text-center">
-                        <button onclick="toggleStatus(${item.id})" class="text-[10px] font-extrabold uppercase px-3 py-1 rounded bg-[#1d1d26] border ${isChecked ? 'border-green-500 text-green-400 bg-green-950/40' : 'border-gray-700 text-gray-400 hover:border-yellow-500'} transition cursor-pointer">
-                            ${isChecked ? '✓ SELESAI' : 'AKTIF'}
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+      osc1.type = 'sawtooth';
+      osc2.type = 'sine';
 
-        // Toggle Status manually
-        function toggleStatus(id) {
-            statusState[id] = !statusState[id];
-            localStorage.setItem('pasaran_status_state', JSON.stringify(statusState));
-            renderTable();
-        }
+      const now = audioCtx.currentTime;
+      osc1.frequency.setValueAtTime(800, now);
+      osc1.frequency.linearRampToValueAtTime(1400, now + 0.3);
+      osc2.frequency.setValueAtTime(400, now);
 
-        // Clock & Alarm Monitor
-        function startClockAndAlarm() {
-            setInterval(() => {
-                // WIB is UTC + 7
-                const now = new Date();
-                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                const wib = new Date(utc + (3600000 * 7));
+      gainNode.gain.setValueAtTime(0.3, now);
 
-                const h = String(wib.getHours()).padStart(2, '0');
-                const m = String(wib.getMinutes()).padStart(2, '0');
-                const s = String(wib.getSeconds()).padStart(2, '0');
+      osc1.connect(gainNode);
+      osc2.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
 
-                document.getElementById('digitalClock').innerText = `${h} : ${m} : ${s}`;
+      osc1.start();
+      osc2.start();
 
-                // Check alarms on exact minutes
-                const currentHHMM = `${h}:${m}`;
-                if (s === '00') {
-                    checkAlarmTriggers(currentHHMM);
-                }
-            }, 1000);
-        }
+      activeOscillators = [osc1, osc2];
 
-        // Check if any market matches time
-        function checkAlarmTriggers(currentHHMM) {
-            pasaranData.forEach(item => {
-                // Extract clean HH:MM string
-                const parseTime = (timeStr) => timeStr.replace('WIB', '').trim().replace('.', ':');
-                const resultParsed = parseTime(item.result);
+      // Repeat sirene effect
+      this.alarmInterval = setInterval(() => {
+        if (!isAlarmRinging || !audioCtx) return;
+        const t = audioCtx.currentTime;
+        osc1.frequency.cancelScheduledValues(t);
+        osc1.frequency.setValueAtTime(800, t);
+        osc1.frequency.linearRampToValueAtTime(1400, t + 0.3);
+      }, 400);
+    }
 
-                // ALARM KHUSUS BERBUNYI SAAT JAM RESULT TERCAPAI
-                if (resultParsed === currentHHMM) {
-                    const key = `${item.id}-RESULT-${currentHHMM}`;
-                    if (!triggeredKeys.has(key)) {
-                        triggeredKeys.add(key);
-                        
-                        // Otomatis ubah status pasaran menjadi SELESAI / CHECKLIST
-                        statusState[item.id] = true;
-                        localStorage.setItem('pasaran_status_state', JSON.stringify(statusState));
-                        renderTable();
+    function stopAlarm() {
+      isAlarmRinging = false;
+      if (this.alarmInterval) clearInterval(this.alarmInterval);
+      activeOscillators.forEach(osc => {
+        try { osc.stop(); } catch(e){}
+      });
+      activeOscillators = [];
+      document.getElementById('alarmModal').classList.remove('show');
 
-                        // Sorot baris pasaran yang result
-                        highlightResultRow(item.id);
+      // Clear highlighted rows
+      document.querySelectorAll('.tr-alert').forEach(row => row.classList.remove('tr-alert'));
+    }
 
-                        // Bunyikan Alarm jika audio aktif
-                        if (isAudioActive) {
-                            triggerAlarm(item, 'RESULT');
-                        }
-                    }
-                }
-            });
-        }
+    function triggerAlarmForResult(namaPasaran, rowIndex) {
+      // Auto checklist
+      completedItems[namaPasaran] = true;
+      localStorage.setItem('completedResultItems', JSON.stringify(completedItems));
+      
+      const btn = document.getElementById(`status-btn-${rowIndex}`);
+      if (btn) {
+        btn.classList.add('done');
+        btn.textContent = '✓ SELESAI';
+      }
 
-        // Flash/Highlight row when RESULT time hits
-        function highlightResultRow(pasaranId) {
-            const rows = document.querySelectorAll('.table-row-item');
-            pasaranData.forEach((item, index) => {
-                if (item.id === pasaranId && rows[index]) {
-                    rows[index].classList.add('bg-emerald-900/40', 'ring-2', 'ring-emerald-400');
-                    setTimeout(() => {
-                        if (rows[index]) {
-                            rows[index].classList.remove('ring-2', 'ring-emerald-400');
-                        }
-                    }, 10000);
-                }
-            });
-        }
+      // Highlight Row
+      const row = document.getElementById(`row-${rowIndex}`);
+      if (row) row.classList.add('tr-alert');
 
-        // Trigger Alarm Sound & Popup
-        function triggerAlarm(item, type) {
-            document.getElementById('modalPasaranName').innerText = item.name;
-            document.getElementById('modalPasaranTime').innerText = `JAM RESULT KELUAR: ${item.result}`;
-            document.getElementById('alarmModal').classList.remove('hidden');
+      // Play Sound & Show Modal
+      if (audioEnabled) {
+        playSirenSound();
+      }
 
-            playLoudSiren();
-        }
+      document.getElementById('modalText').textContent = `Pasaran ${namaPasaran} telah memasuki JAM RESULT!`;
+      document.getElementById('alarmModal').classList.add('show');
+    }
 
-        // Play Continuous Siren Tone
-        function playLoudSiren() {
-            initAudioCtx();
-            stopSirenSound();
+    function updateClockAndCheckAlarm() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
 
-            let frequency = 700;
-            let goingUp = true;
+      document.getElementById('clock').textContent = `${hours} : ${minutes} : ${seconds}`;
+      const currentTimeStr = `${hours}:${minutes}`;
 
-            alarmInterval = setInterval(() => {
-                if (!audioCtx) return;
-                try {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
+      // Reset triggered buffer at 00:00:00
+      if (hours === '00' && minutes === '00' && seconds === '00') {
+        triggeredTimes = {};
+      }
 
-                    osc.type = 'sawtooth';
-                    
-                    if (goingUp) {
-                        frequency += 100;
-                        if (frequency >= 1200) goingUp = false;
-                    } else {
-                        frequency -= 100;
-                        if (frequency <= 700) goingUp = true;
-                    }
+      // Check RESULT Alarm match (only at second '00')
+      if (seconds === '00') {
+        rawData.forEach((item, index) => {
+          const [nama, tutup, resultStr] = item;
+          const cleanResult = resultStr.replace('WIB', '').replace('.', ':').trim();
 
-                    osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+          if (cleanResult === currentTimeStr && !triggeredTimes[`${nama}-${cleanResult}`]) {
+            triggeredTimes[`${nama}-${cleanResult}`] = true;
+            triggerAlarmForResult(nama, index);
+          }
+        });
+      }
+    }
 
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
+    function testAlarm() {
+      if (!audioEnabled) {
+        toggleAudio();
+      }
+      triggerAlarmForResult("TES PASARAN", 0);
+    }
 
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.15);
-                } catch (e) {
-                    console.error("Audio error:", e);
-                }
-            }, 160);
-        }
+    function filterTable() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#pasaranTableBody tr');
 
-        function stopSirenSound() {
-            if (alarmInterval) {
-                clearInterval(alarmInterval);
-                alarmInterval = null;
-            }
-        }
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(input) ? '' : 'none';
+      });
+    }
 
-        function stopCurrentAlarm() {
-            stopSirenSound();
-            document.getElementById('alarmModal').classList.add('hidden');
-        }
-
-        // Initialize Web Audio Context
-        function initAudioCtx() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }
-
-        // Toggle Audio Button State
-        function toggleAudio() {
-            initAudioCtx();
-            isAudioActive = !isAudioActive;
-
-            const btn = document.getElementById('toggleAudioBtn');
-            const icon = document.getElementById('audioIcon');
-            const text = document.getElementById('audioBtnText');
-            const statusText = document.getElementById('audioStatusText');
-
-            if (isAudioActive) {
-                btn.className = "bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs sm:text-sm py-2 px-5 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg cursor-pointer";
-                icon.className = "fa-solid fa-volume-xmark";
-                text.innerText = "Matikan Suara Alarm";
-                statusText.innerText = "Aktif";
-                statusText.className = "text-yellow-400 font-bold";
-            } else {
-                btn.className = "bg-gray-800 hover:bg-gray-700 text-gray-300 font-extrabold text-xs sm:text-sm py-2 px-5 rounded-full flex items-center gap-2 transition-all duration-200 cursor-pointer";
-                icon.className = "fa-solid fa-volume-high";
-                text.innerText = "Aktifkan Suara Alarm";
-                statusText.innerText = "Mati";
-                statusText.className = "text-gray-500 font-bold";
-                stopSirenSound();
-            }
-        }
-
-        // Test Alarm Sound
-        function testAlarmSound() {
-            initAudioCtx();
-            isAudioActive = true;
-            document.getElementById('audioStatusText').innerText = "Aktif";
-            triggerAlarm({ name: "TES RESULT PASARAN", tutup: "12:00 WIB", result: "12:30 WIB" }, "RESULT");
-        }
-
-        // Filter Table Pasaran Search
-        function filterPasaran() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const rows = document.getElementById('tableBody').getElementsByTagName('tr');
-
-            for (let i = 0; i < rows.length; i++) {
-                const nameTd = rows[i].getElementsByTagName('td')[0];
-                if (nameTd) {
-                    const txt = nameTd.textContent || nameTd.innerText;
-                    rows[i].style.display = txt.toLowerCase().includes(query) ? "" : "none";
-                }
-            }
-        }
-
-        // Reset Status State
-        function resetAllStatus() {
-            if (confirm("Reset semua status pasaran menjadi Aktif kembali?")) {
-                statusState = {};
-                localStorage.removeItem('pasaran_status_state');
-                renderTable();
-            }
-        }
-
-        function escapeHtml(str) {
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-    </script>
+    // Init App
+    initTable();
+    setInterval(updateClockAndCheckAlarm, 1000);
+    updateClockAndCheckAlarm();
+  </script>
 </body>
 </html>
