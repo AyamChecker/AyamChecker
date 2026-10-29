@@ -534,6 +534,34 @@
       });
     }
 
+    function setStatusSelesai(namaPasaran, rowIndex) {
+      // Perbarui data penyimpanan
+      completedItems[namaPasaran] = true;
+      localStorage.setItem('completedResultItems', JSON.stringify(completedItems));
+      
+      // Cari tombol berdasarkan index atau iterasi pencarian nama
+      let btn = document.getElementById(`status-btn-${rowIndex}`);
+      if (!btn) {
+        // Fallback jika rowIndex tidak cocok
+        rawData.forEach((item, idx) => {
+          if (item[0] === namaPasaran) {
+            btn = document.getElementById(`status-btn-${idx}`);
+            rowIndex = idx;
+          }
+        });
+      }
+
+      if (btn) {
+        btn.classList.add('done');
+        btn.textContent = '✓ SELESAI';
+      }
+
+      const row = document.getElementById(`row-${rowIndex}`);
+      if (row) {
+        row.classList.add('tr-alert');
+      }
+    }
+
     function toggleStatus(index, nama) {
       completedItems[nama] = !completedItems[nama];
       localStorage.setItem('completedResultItems', JSON.stringify(completedItems));
@@ -574,7 +602,6 @@
       }
     }
 
-    // Suara Sirene Mobil Polisi Autentik (Police Wail)
     function playPoliceSiren() {
       if (!audioCtx) return;
       stopAlarm();
@@ -583,7 +610,7 @@
       const osc = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
 
-      osc.type = 'sawtooth'; // Suara nyaring tajam khas sirene
+      osc.type = 'sawtooth';
       gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
 
       osc.connect(gainNode);
@@ -598,11 +625,9 @@
         osc.frequency.cancelScheduledValues(now);
 
         if (!highPitch) {
-          // Ramp up ke nada tinggi (Wail Sirene)
           osc.frequency.setValueAtTime(600, now);
           osc.frequency.linearRampToValueAtTime(1350, now + 0.45);
         } else {
-          // Ramp down ke nada rendah
           osc.frequency.setValueAtTime(1350, now);
           osc.frequency.linearRampToValueAtTime(600, now + 0.45);
         }
@@ -625,25 +650,15 @@
     }
 
     function triggerAlarmForResult(namaPasaran, rowIndex) {
-      // Auto checklist
-      completedItems[namaPasaran] = true;
-      localStorage.setItem('completedResultItems', JSON.stringify(completedItems));
-      
-      const btn = document.getElementById(`status-btn-${rowIndex}`);
-      if (btn) {
-        btn.classList.add('done');
-        btn.textContent = '✓ SELESAI';
-      }
+      // 1. Eksekusi checklist terlebih dahulu
+      setStatusSelesai(namaPasaran, rowIndex);
 
-      // Highlight Row
-      const row = document.getElementById(`row-${rowIndex}`);
-      if (row) row.classList.add('tr-alert');
-
-      // Play Police Siren Sound
+      // 2. Bunyikan suara sirene jika audio aktif
       if (audioEnabled) {
         playPoliceSiren();
       }
 
+      // 3. Tampilkan modal peringatan
       document.getElementById('modalText').textContent = `Pasaran ${namaPasaran} telah mengeluarkan RESULT!`;
       document.getElementById('alarmModal').classList.add('show');
     }
@@ -657,12 +672,12 @@
       document.getElementById('clock').textContent = `${hours} : ${minutes} : ${seconds}`;
       const currentTimeStr = `${hours}:${minutes}`;
 
-      // Reset buffer jam 00:00:00
+      // Reset buffer pemicu harian pada 00:00:00
       if (hours === '00' && minutes === '00' && seconds === '00') {
         triggeredTimes = {};
       }
 
-      // Cek Alarm saat detik 00 pada Jam RESULT
+      // Cek Jam RESULT tepat pada detik 00
       if (seconds === '00') {
         rawData.forEach((item, index) => {
           const [nama, tutup, resultStr] = item;
@@ -680,7 +695,7 @@
       if (!audioEnabled) {
         toggleAudio();
       }
-      triggerAlarmForResult("TES PASARAN", 0);
+      triggerAlarmForResult(rawData[0][0], 0);
     }
 
     function filterTable() {
@@ -693,7 +708,7 @@
       });
     }
 
-    // Init App
+    // Inisialisasi Aplikasi
     initTable();
     setInterval(updateClockAndCheckAlarm, 1000);
     updateClockAndCheckAlarm();
