@@ -23,7 +23,6 @@
       padding: 25px 15px;
     }
 
-    /* Container dengan efek Animated Neon Border 2 Warna Memutar */
     .neon-card {
       position: relative;
       width: 100%;
@@ -296,15 +295,6 @@
       box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
     }
 
-    .tr-alert {
-      animation: alertPolice 0.5s infinite alternate;
-    }
-
-    @keyframes alertPolice {
-      0% { background: rgba(255, 0, 55, 0.25) !important; box-shadow: inset 0 0 15px rgba(255, 0, 55, 0.8); }
-      100% { background: rgba(0, 243, 255, 0.25) !important; box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.8); }
-    }
-
     .footer-text {
       text-align: center;
       color: #666;
@@ -330,6 +320,13 @@
       pointer-events: auto;
     }
 
+    .modal-wrapper {
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
     .modal-content {
       background: #12141c;
       border: 3px solid #ff0055;
@@ -337,9 +334,10 @@
       border-radius: 16px;
       padding: 30px;
       text-align: center;
-      max-width: 420px;
+      max-width: 450px;
       width: 90%;
       animation: pulseBorder 0.6s infinite alternate;
+      z-index: 2;
     }
 
     @keyframes pulseBorder {
@@ -373,15 +371,28 @@
       box-shadow: 0 0 15px rgba(255, 0, 85, 0.6);
     }
 
-    @media (max-width: 600px) {
+    .modal-side-img {
+      position: absolute;
+      left: 78%;
+      bottom: 0;
+      height: 380px;
+      object-fit: contain;
+      z-index: 3;
+      pointer-events: none; 
+    }
+
+    @media (max-width: 768px) {
       .digital-clock { font-size: 2.5rem; }
       .search-input { width: 100%; }
+      .modal-side-img {
+        height: 250px;
+        left: 60%;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Container Clock -->
   <div class="neon-card">
     <div class="clock-section">
       <div class="clock-title">
@@ -393,18 +404,17 @@
           <span id="audioIcon">🔇</span>
           <span id="audioText">Aktifkan Suara Alarm</span>
         </button>
-        <button class="btn-secondary" onclick="testAlarm()">Tes Suara Alaram</button>
+        <button class="btn-secondary" onclick="testAlarm()"> Tes Suara Alaram</button>
         <button class="btn-secondary" onclick="resetChecklist()">🔄 Reset Status</button>
         <div class="status-badge">Status Alarm: <span id="statusAudioText">Mati</span></div>
       </div>
     </div>
   </div>
 
-  <!-- Container Tabel -->
   <div class="neon-card">
     <div class="table-header-bar">
       <div class="table-title">
-        <span></span> DAFTAR JADWAL PASARAN & LIVE DRAW
+        <span>📋</span> DAFTAR JADWAL PASARAN & LIVE DRAW
       </div>
       <input type="text" id="searchInput" class="search-input" placeholder="Cari nama pasaran..." onkeyup="filterTable()">
     </div>
@@ -413,29 +423,29 @@
       <table>
         <thead>
           <tr>
-            <th>PASARAN (KLIK UNTUK LIVE DRAW)</th>
+            <th>PASARAN (KLIK DISINI UNTUK LIVE DRAW)</th>
             <th>TUTUP</th>
             <th>RESULT</th>
             <th>STATUS</th>
           </tr>
         </thead>
         <tbody id="pasaranTableBody">
-          <!-- Render via JavaScript -->
         </tbody>
       </table>
     </div>
   </div>
 
   <div class="footer-text">
-    Aplikasi Alarm Pasaran • Police Siren Edition (WIB)
+    Alarm Pasaran
   </div>
-
-  <!-- Modal Pop-up Alarm RESULT -->
   <div class="modal-overlay" id="alarmModal">
-    <div class="modal-content">
-      <div class="modal-title">🚨 RESULT KELUAR!</div>
-      <div class="modal-body" id="modalText">Pasaran - telah mengeluarkan RESULT!</div>
-      <button class="btn-modal-stop" onclick="stopAlarm()">MATIKAN SIRENE</button>
+    <div class="modal-wrapper">
+      <div class="modal-content">
+        <div class="modal-title">RESULT!</div>
+        <div class="modal-body" id="modalText">Pasaran - RESULT!</div>
+        <button class="btn-modal-stop" onclick="stopAlarm()">MATIKAN</button>
+      </div>
+      <img src="https://popad.rifkihaz37.workers.dev/" alt="Character" class="modal-side-img" id="popupImage">
     </div>
   </div>
 
@@ -501,7 +511,6 @@
       return str.replace('WIB', '').replace('.', ':').trim();
     }
 
-    // Ubah format "HH:MM" ke total menit dari awal hari agar mudah dibandingkan secara matematis
     function timeToMinutes(timeStr) {
       const [h, m] = timeStr.split(':').map(Number);
       return h * 60 + m;
@@ -533,31 +542,6 @@
         `;
         tbody.appendChild(tr);
       });
-    }
-
-    function setStatusSelesai(namaPasaran, rowIndex) {
-      completedItems[namaPasaran] = true;
-      localStorage.setItem('completedResultItems', JSON.stringify(completedItems));
-      
-      let btn = document.getElementById(`status-btn-${rowIndex}`);
-      if (!btn) {
-        rawData.forEach((item, idx) => {
-          if (item[0] === namaPasaran) {
-            btn = document.getElementById(`status-btn-${idx}`);
-            rowIndex = idx;
-          }
-        });
-      }
-
-      if (btn) {
-        btn.classList.add('done');
-        btn.textContent = '✓ SELESAI';
-      }
-
-      const row = document.getElementById(`row-${rowIndex}`);
-      if (row) {
-        row.classList.add('tr-alert');
-      }
     }
 
     function toggleStatus(index, nama) {
@@ -644,12 +628,9 @@
         currentOscillator = null;
       }
       document.getElementById('alarmModal').classList.remove('show');
-      document.querySelectorAll('.tr-alert').forEach(row => row.classList.remove('tr-alert'));
     }
 
     function triggerAlarmForResult(namaPasaran, rowIndex, playSound = true) {
-      setStatusSelesai(namaPasaran, rowIndex);
-
       if (playSound && audioEnabled) {
         playPoliceSiren();
       }
@@ -668,28 +649,19 @@
       const currentTimeStr = `${hours}:${minutes}`;
       const currentTotalMinutes = timeToMinutes(currentTimeStr);
 
-      // Reset otomatis ketika jam 00:00:00 (pergantian hari)
       if (hours === '00' && minutes === '00' && seconds === '00') {
         completedItems = {};
         localStorage.removeItem('completedResultItems');
         initTable();
       }
 
-      // Cek pencocokan Jam RESULT
       rawData.forEach((item, index) => {
         const [nama, tutup, resultStr] = item;
         const cleanResult = formatTime(resultStr);
         const resultTotalMinutes = timeToMinutes(cleanResult);
 
-        // Jika waktu sekarang sudah melewati atau pas jam result, dan status belum selesai
-        if (currentTotalMinutes >= resultTotalMinutes && !completedItems[nama]) {
-          // Beri toleransi waktu tertinggal dalam rentang 15 menit agar tidak alarm susulan untuk hari kemarin
-          if (currentTotalMinutes - resultTotalMinutes <= 15) {
-            triggerAlarmForResult(nama, index, true);
-          } else {
-            // Jika sudah terlewat jauh (misal tertinggal berjam-jam saat HP mati), otomatiskan checklist tanpa bunyi alarm panjang agar tidak mengagetkan
-            setStatusSelesai(nama, index);
-          }
+        if (currentTotalMinutes === resultTotalMinutes && !completedItems[nama]) {
+          triggerAlarmForResult(nama, index, true);
         }
       });
     }
@@ -711,12 +683,10 @@
       });
     }
 
-    // Inisialisasi
     initTable();
     setInterval(updateClockAndCheckAlarm, 1000);
     updateClockAndCheckAlarm();
 
-    // Fitur Catch-Up: Periksa ulang otomatis begitu tab kembali aktif atau dibuka dari background HP
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         updateClockAndCheckAlarm();
